@@ -124,18 +124,18 @@ setup, alone or together.
 | ID | Question | Options | Status |
 |---|---|---|---|
 | D9.1 ❗ | Which **setup types** are enabled (choose any) | **All three: T1, T2 and T3** | DECIDED |
-| D9.2 | Maximum time between the two core events (minutes, per D2.4; 0 = both on the same candle is allowed) | ★ 50 minutes (10 candles on 5m) | OPEN |
-| D9.3 | Several sweeps before one shift (e.g. Asia low, then PDL, then CHoCH) | a) ★ all attach to the setup and are used up; the stop goes beyond the most extreme one · b) only the most recent attaches | OPEN |
-| D9.4 | **Location** requirement (zone, FVG, key level) | a) ★ at least one location factor required · b) location is shown on the checklist only · c) a specific one is required (say which) | OPEN |
-| D9.5 | **Session** filter | a) ★ hard filter: setups form only inside sessions you mark as tradeable (D15.2) · b) checklist item only | OPEN |
+| D9.2 | Maximum time between the two core events (minutes, per D2.4; 0 = both on the same candle is allowed) | **50 minutes** maximum between the two core events | DECIDED |
+| D9.3 | Several sweeps before one shift (e.g. Asia low, then PDL, then CHoCH) | **a) all attach and are used up; stop beyond the most extreme sweep** | DECIDED |
+| D9.4 | **Location** requirement (zone, FVG, key level) | **a) at least one location item required** (zone, FVG or key level). With Model B the FVG always meets it, so M = 1 needs bias, zone or a different key level. | DECIDED |
+| D9.5 | **Session** filter | **a) hard filter**: the trigger candle must close inside NY AM (08:30–11:00 Chicago) | DECIDED |
 | D9.6 ❗ | **Bias** components (choose any) | **Swing-structure trend + price vs VWAP**, VWAP anchored at **08:30 Chicago** | DECIDED |
 | D9.7 | Bias rule | **a) both components must agree**, otherwise bias = neutral | DECIDED |
 | D9.8 ❗ | Setups **against the bias** | **b) allowed, flagged "counter-bias"** | DECIDED |
 | D9.9 ❗ | Minimum number of **optional** checklist factors (M) | **M = 1**, counted from the optional items defined in D9.11/D9.12. Items that are already required don't count. | DECIDED |
-| D9.10 | One event combination matches two setup types (e.g. an ORB sweep + shift fits both T1 and T3) | Only one setup is ever created (LC-1). It's labelled a) ★ as the more specific type (T3 over T1) · b) as T1 | OPEN |
+| D9.10 | One event combination matches two setup types (e.g. an ORB sweep + shift fits both T1 and T3) | **a) labelled as the more specific type (T3)** | DECIDED |
 | D9.11 | When "at a key level" counts as an optional item | **Only when the setup is at a different key level from the one used by its two core events** | DECIDED |
 | D9.12 | ORB position (above / inside / below) on the checklist | **Shown on the checklist, not counted toward M.** It's fixed by setup type (always ✓ for T2, always ✗ for T3). | DECIDED |
-| D9.13 | When a setup is **"at" a different key level** (D9.11) | ★ c) either the stop-anchor point **or** the Model B limit entry is within the D5.8 tolerance (larger of 4 ticks and 0.1 × ATR) of a D5.1-list level other than the core events' level. This mirrors D7.8. Levels already swept or broken **still count** here, because a broken level often acts as support or resistance. Alternatives: a) stop-anchor point only · b) limit entry only · d) untouched levels only | OPEN |
+| D9.13 | When a setup is **"at" a different key level** (D9.11) | **c) either the stop-anchor point or the limit entry** is within the D5.8 tolerance of another D5.1-list level; swept or broken levels **still count** | DECIDED |
 
 ## D10 — Entry models
 
@@ -145,15 +145,15 @@ retest level and wait for a later candle to reach it.
 
 | ID | Question | Options | Status |
 |---|---|---|---|
-| D10.1 | How the models are offered | a) ★ one model chosen per chart in settings (one clear plan per setup) · b) both plans shown for every setup | OPEN |
+| D10.1 | How the models are offered | **a) one model per chart, chosen in settings** (default B) | DECIDED |
 | D10.2 ❗ | **Default** model | **B: Limit Retest** | DECIDED |
-| D10.3 | Model A: extra requirement on the trigger candle | a) ★ none (the trigger event already requires a close) · b) close in the outer X % of its range · c) body ≥ k × ATR | OPEN |
+| D10.3 | Model A: extra requirement on the trigger candle | **a) no extra requirement** on the Model A trigger candle | DECIDED |
 | D10.4 ❗ | Model B: **retest level** | **b) FVG 50 %**. If several qualifying FVGs exist (which ones qualify: D8.4), use the **most recent one, closest to current price**. | DECIDED |
-| D10.5 | Model B: the chosen level doesn't exist for this setup (e.g. no FVG formed) | a) ★ the setup is rejected (no substitute) · b) fall back to another level (say which) | OPEN |
-| D10.6 | Model B: **fill** rule | a) price touches the limit · b) ★ price trades through the limit by ≥ 1 tick (more conservative) | OPEN |
+| D10.5 | Model B: the chosen level doesn't exist for this setup (e.g. no FVG formed) | **a) setup rejected** ("no FVG"), no fallback level | DECIDED |
+| D10.6 | Model B: **fill** rule | **b) trade through the limit by ≥ 1 tick** | DECIDED |
 | D10.7 ❗ | Model B: **expiry**, in candles without a fill | **30 minutes** (6 candles on 5m, 30 candles on 1m) | DECIDED |
-| D10.8 | Model B: TP1 is reached before a fill | a) ★ setup ends as MISSED · b) keep waiting | OPEN |
-| D10.9 | Accept the conservative fill/outcome conventions in `entry_models.md` §4 | ★ accept | OPEN |
+| D10.8 | Model B: TP1 is reached before a fill | **a) setup ends as MISSED** when TP1 is reached before a fill | DECIDED |
+| D10.9 | Accept the conservative fill/outcome conventions in `entry_models.md` §4 | **Accepted**: conservative same-candle conventions in entry_models.md §4 | DECIDED |
 
 ## D11 — Stop placement
 
@@ -308,3 +308,15 @@ These questions set the remaining details.
 | 2026-09-25 | D8.5 | Decided: The candles from the stop-anchor point (sweep extreme for T1/T3, BOS-origin swing for T2) up to and including the trigger candle | Group 4 answer |
 | 2026-09-25 | D8.6 | Decided: b) usable: wait one more candle for the trigger candle's gap to confirm, then place the limit and run the stop/R:R checks (once). No gap and no earlier gap: rejected ("no FVG"). | Group 4 answer |
 | 2026-09-25 | D9.13 | Added: definition of "at a different key level" | Gap found while reviewing Group 5 |
+| 2026-09-25 | D9.2 | Decided: 50 minutes maximum between the two core events | Group 5 answer |
+| 2026-09-25 | D9.3 | Decided: a) all attach and are used up; stop beyond the most extreme sweep | Group 5 answer |
+| 2026-09-25 | D9.4 | Decided: a) at least one location item required (zone, FVG or key level). With Model B the FVG always meets it, so M = 1 needs bias, zone or a different key level. | Group 5 answer |
+| 2026-09-25 | D9.5 | Decided: a) hard filter: the trigger candle must close inside NY AM (08:30–11:00 Chicago) | Group 5 answer |
+| 2026-09-25 | D9.10 | Decided: a) labelled as the more specific type (T3) | Group 5 answer |
+| 2026-09-25 | D10.1 | Decided: a) one model per chart, chosen in settings (default B) | Group 5 answer |
+| 2026-09-25 | D10.3 | Decided: a) no extra requirement on the Model A trigger candle | Group 5 answer |
+| 2026-09-25 | D10.5 | Decided: a) setup rejected ("no FVG"), no fallback level | Group 5 answer |
+| 2026-09-25 | D10.6 | Decided: b) trade through the limit by ≥ 1 tick | Group 5 answer |
+| 2026-09-25 | D10.8 | Decided: a) setup ends as MISSED when TP1 is reached before a fill | Group 5 answer |
+| 2026-09-25 | D10.9 | Decided: Accepted: conservative same-candle conventions in entry_models.md §4 | Group 5 answer |
+| 2026-09-25 | D9.13 | Decided: c) either the stop-anchor point or the limit entry is within the D5.8 tolerance of another D5.1-list level; swept or broken levels still count | Group 5 answer |
