@@ -189,8 +189,8 @@ These questions set the remaining details.
 | D14.5 | Can the event that stopped or invalidated a setup be used for an opposite setup? | a) ★ no: it's used up · b) yes, after cooldown | OPEN |
 | D14.6 ❗ | Extra requirement for an **opposite-direction** setup after a setup ends | **a) nothing extra**: an opposite setup is treated like any other (still needs new events after cooldown) | DECIDED |
 | D14.7 | A candidate **rejected** by a filter (stop too large, R:R too low, outside session, cap) | a) ★ never re-evaluated: each event combination is checked exactly once, on the candle its final event confirms · b) may be re-checked for N candles | OPEN |
-| D14.8 ❗ | Maximum setups **per session** | a) no cap · b) X | OPEN |
-| D14.9 ❗ | Maximum setups **per day** | a) no cap · b) X | OPEN |
+| D14.8 ❗ | Maximum setups **per session** | **2 per morning**, counting **filled setups only** (expired, missed and rejected ones don't count). Once 2 have filled, later candidates are rejected ("cap"). | DECIDED |
+| D14.9 ❗ | Maximum setups **per day** | **Same limit as D14.8**: one cap of 2 filled setups per morning (NY AM is the only tradeable session) | DECIDED |
 | D14.10 ❗ | After a STOPPED setup, can a **same-direction** setup form later in the same session? | a) yes, with new events (D14.4) · b) no | OPEN |
 | D14.11 | Does "previous setup" reset each morning? | **Yes.** The previous setup only affects setups within the **same morning**; yesterday's setups never affect today's. | DECIDED |
 
@@ -252,3 +252,5 @@ These questions set the remaining details.
 | 2026-09-25 | D14.3 | Decided: 30-minute cooldown after every outcome | Your answer |
 | 2026-09-25 | D14.6 | Decided: a) nothing extra for opposite-direction setups | Your answer |
 | 2026-09-25 | D14.11 | Added and decided: previous-setup rules reset each morning | Your answer |
+| 2026-09-25 | D14.8 | Decided: max 2 filled setups per morning | Your answer |
+| 2026-09-25 | D14.9 | Decided: same limit as D14.8 (one cap per morning) | Your answer |
