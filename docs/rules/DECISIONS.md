@@ -23,10 +23,10 @@ Status key: `OPEN` · `DECIDED` · `CHANGED` (decided, then revised; see change 
 |---|---|---|---|
 | D1.1 ❗ | ORB **start time** | **08:00** (Chicago time, per D1.2) = 09:00 New York | DECIDED |
 | D1.2 ❗ | **Timezone** for the ORB (and for sessions, unless D15.3 says otherwise) | **b) Chicago** (America/Chicago) | DECIDED |
-| D1.3 | How the ORB **end** is defined | a) ★ start + length preset (5/15/30/60 min) · b) an explicit end time you type | OPEN |
+| D1.3 | How the ORB **end** is defined | **a) start + length preset** (5/15/30/60 min). Current range: 08:00–08:15 Chicago | DECIDED |
 | D1.4 | Default ORB **length** | 15 minutes (from your scope message); 5/15/30/60 selectable | DECIDED |
 | D1.5 ❗ | **ORB trading window end**: time after which no ORB-based setup may form | **11:00 Chicago** (= 12:00 New York) | DECIDED |
-| D1.6 | How many opening ranges | a) ★ one configurable ORB (simpler, cleaner chart) · b) two independent ORBs (e.g. 08:00 and 09:30) | OPEN |
+| D1.6 | How many opening ranges | **a) one configurable ORB** | DECIDED |
 
 ## D2 — Chart timeframes and account
 
@@ -41,8 +41,8 @@ Status key: `OPEN` · `DECIDED` · `CHANGED` (decided, then revised; see change 
 
 | ID | Question | Options | Status |
 |---|---|---|---|
-| D3.1 | What counts as an ORB **breakout** | a) ★ one candle **closes** beyond the ORB level · b) close beyond by at least X ticks · c) two consecutive closes beyond · d) close beyond with a displacement body (≥ k × ATR) | OPEN |
-| D3.2 | Breakouts per side per day | a) ★ first breakout only · b) a new breakout after price returns inside also counts | OPEN |
+| D3.1 | What counts as an ORB **breakout** | **a) one candle close beyond the ORB level** | DECIDED |
+| D3.2 | Breakouts per side per day | **a) first breakout per side only** | DECIDED |
 
 ★ D3.1a: simplest objective rule, and it doesn't repaint. D3.2a: fewer repeated events.
 
@@ -50,9 +50,9 @@ Status key: `OPEN` · `DECIDED` · `CHANGED` (decided, then revised; see change 
 
 | ID | Question | Options | Status |
 |---|---|---|---|
-| D4.1 | Definition of an ORB **false breakout** | a) ★ a confirmed breakout (D3.1), then a candle **closes back inside** the range within N candles · b) same, but the close back must also be beyond the ORB **midpoint** | OPEN |
-| D4.2 | Time allowed for the failure (minutes, per D2.4) | ★ 15 minutes (3 candles on 5m) | OPEN |
-| D4.3 | A wick through the ORB level that **closes inside** with no confirmed breakout | a) ★ recorded as an **"ORB sweep"** (a liquidity event, kept separate from a false breakout) · b) treated as a false breakout · c) ignored | OPEN |
+| D4.1 | Definition of an ORB **false breakout** | **a) confirmed breakout, then a close back inside the range** within D4.2 | DECIDED |
+| D4.2 | Time allowed for the failure (minutes, per D2.4) | **15 minutes** (3 candles on 5m) | DECIDED |
+| D4.3 | A wick through the ORB level that **closes inside** with no confirmed breakout | **a) recorded as an "ORB sweep"** (liquidity event, separate from a false breakout) | DECIDED |
 
 ## D5 — Liquidity and sweeps
 
@@ -257,3 +257,10 @@ These questions set the remaining details.
 | 2026-09-25 | D14.9 | Decided: same limit as D14.8 (one cap per morning) | Your answer |
 | 2026-09-25 | D14.10 | Decided: a) same-direction setup after a stop allowed, from new events only | Your answer |
 | 2026-09-25 | D14.12 | Added and decided: stop-out = full stop at a loss only | Your answer |
+| 2026-09-25 | D1.3 | Decided: a) start + length preset (5/15/30/60 min). Current range: 08:00–08:15 Chicago | ★ accepted (Group 1) |
+| 2026-09-25 | D1.6 | Decided: a) one configurable ORB | ★ accepted (Group 1) |
+| 2026-09-25 | D3.1 | Decided: a) one candle close beyond the ORB level | ★ accepted (Group 1) |
+| 2026-09-25 | D3.2 | Decided: a) first breakout per side only | ★ accepted (Group 1) |
+| 2026-09-25 | D4.1 | Decided: a) confirmed breakout, then a close back inside the range within D4.2 | ★ accepted (Group 1) |
+| 2026-09-25 | D4.2 | Decided: 15 minutes (3 candles on 5m) | ★ accepted (Group 1) |
+| 2026-09-25 | D4.3 | Decided: a) recorded as an "ORB sweep" (liquidity event, separate from a false breakout) | ★ accepted (Group 1) |
