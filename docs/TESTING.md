@@ -35,15 +35,64 @@ A self-test feeds a scripted sequence of candles (or, for the lifecycle engine, 
 into the module and compares the result with the expected answer written in the rulebook.
 The IDs below are the minimum set. Each module's rulebook adds its own cases.
 
-### 3.1 Core: level-interaction engine (LI)
-Values: minimum penetration 2 ticks, touch tolerance 2 ticks, same-candle close-back, close in the half away from the level.
-- LI-01: the high comes within 2 ticks of a level without going through → **TOUCH**, and the level stays active.
-- LI-02: the wick goes 2+ ticks through, the same candle closes back, in the half of its range away from the level → **SWEEP**, and the level is used up.
-- LI-03: the wick goes 1 tick through, then closes back → **TOUCH**, not a sweep.
-- LI-04: the wick goes 2+ ticks through and closes back, but in the half **near** the level → **not a sweep**.
-- LI-05: a candle closes beyond the level → **BREAK**, and the level is used up.
-- LI-06: a level already swept is swept again → no second sweep event.
-- LI-07: the close is exactly at the candle midpoint → counts as "the half away" (derived rule R7).
+### 3.1 Core (Phase 1; rulebook `rules/core.md`)
+Test indicator: `dist/test/core_test.pine`. Scripted candles use tick 0.25.
+
+**Level interaction (LI):** for a high-type level at 100.00 (low-type is mirrored in LI-10)
+
+| ID | Scripted candle(s) | Expected |
+|---|---|---|
+| LI-01 | High 99.50, close 99.00 | **TOUCH** (within 2 ticks); the level stays active |
+| LI-02 | High 100.50, low 99.00, close 99.50 (≤ midpoint 99.75) | **SWEEP**; the level becomes SWEPT |
+| LI-03 | High 100.25 (1 tick through), close 99.50 | **TOUCH** (C3) |
+| LI-04 | High 100.50, low 99.00, close 99.90 (above midpoint 99.75) | **TOUCH**, not a sweep (C3) |
+| LI-05 | Close 100.25 | **BREAK**; the level becomes BROKEN |
+| LI-06 | LI-02, then another sweep candle | **No** second event |
+| LI-07 | High 100.50, low 99.00, close exactly 99.75 (the midpoint) | **SWEEP** (R7) |
+| LI-08 | High 100.50, low 99.50, close exactly 100.00 (at the level, and also the midpoint) | Not a break (C2); close ≤ midpoint (R7) → **SWEEP** |
+| LI-09 | A candle that would sweep, on the same candle the level became known | **Nothing** (C5); judged from the next candle |
+| LI-10 | Low-type level at 100.00: low 99.50, high 101.00, close 100.50 (≥ midpoint 100.25) | **SWEEP**, bullish (mirror) |
+| LI-11 | Two levels at 100.00 and 100.25; high 100.75, low 99.00, close 99.50 | **Both SWEPT** on one candle (C7) |
+| LI-12 | High 103.00, close 100.25 | **BREAK**, not a sweep (C4) |
+| LI-13 | High 99.25 (3 ticks below the level), close 99.00 | **none** |
+
+**Time (TM)**
+
+| ID | Scripted case | Expected |
+|---|---|---|
+| TM-01 | A candle opening Mon 16:55 / another opening Mon 17:00 | Trading day Mon / Tue (C1) |
+| TM-02 | 5m candles 08:25, 08:30, 10:55, 11:00 (open times) | In NY AM: no, yes, yes, no (R1) |
+| TM-03 | 1m candles, 30 min from the 09:02 close | Ends on the candle closing at 09:32 (D2.4) |
+| TM-04 | 5m candles, 30 min from the 09:05 close | Ends on the candle closing at 09:35 |
+| TM-05 | 08:00 Chicago on the Monday after the March and after the November clock change | Both correct |
+| TM-06 | Timeframe 1m, 5m / 3m, 15m, 60m | Supported / notice shown |
+| TM-07 | The first candle of a new trading day | Event store cleared, morning count reset |
+
+**Price (PX)**
+
+| ID | Scripted case | Expected |
+|---|---|---|
+| PX-01 | 50 % of an FVG 100.00–101.00 | 100.50 |
+| PX-02 | 50 % of FVG 100.00–100.75 → 100.375: long / short | 100.50 / 100.25 (C9) |
+| PX-03 | 20 points ↔ ticks | 80 ticks |
+| PX-04 | Core ATR(14) vs TradingView `ta.atr(14)` on the real chart, last 500 candles | Equal to within 1e-9 (C6) |
+
+**Events (EV)**
+
+| ID | Scripted case | Expected |
+|---|---|---|
+| EV-01 | The same sweep judged twice (a re-run of the same candle) | The same event ID |
+| EV-02 | Two sweeps of different levels on one candle | Two different IDs |
+| EV-03 | Mark an event used | It stays used; it's never offered as eligible again |
+| EV-04 | More than 300 events in a day | The oldest are dropped; no error |
+
+**Drawing budget (DB) and theme (TH)**
+
+| ID | Scripted case | Expected |
+|---|---|---|
+| DB-01 | A module with budget 20 lines creates 25 | 20 exist; the 5 oldest were deleted |
+| DB-02 | All modules at full budget | Totals stay ≤ 500 per object type |
+| TH-01 | Background #131722 / #FFFFFF | Dark / light tokens |
 
 ### 3.2 Opening range (OR)
 Values: 08:00–08:15 Chicago, breakouts until 11:00.
@@ -174,4 +223,4 @@ more or fewer setups. A day with zero setups is a valid result.
 | Date | Phase / module | Level | Result | Notes / screenshot |
 |---|---|---|---|---|
 | 2026-09-25 | Phase 0 / tooling | L0 | PASS | 32 tool self-tests, lint (0 problems), build check: all pass locally |
-| — | Phase 0 / pipeline check | L1 | *waiting for you* | Add `dist/NQ_ORB.pine` to a chart; expect a small grey status line bottom-right and no errors |
+| 2026-09-25 | Phase 0 / pipeline check | L1 | PASS | Compiled and added to an NQ1! 5m chart in TradingView with no errors (reported by you) |
