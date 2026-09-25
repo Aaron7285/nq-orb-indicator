@@ -77,7 +77,7 @@ engine still records touches and breaks for display.
 | D6.1 | **Swing** sensitivity (candles on each side needed to confirm a swing) | ★ 10 (a starting point, to be tuned after seeing it on your timeframe) | OPEN |
 | D6.2 | **Internal** sensitivity | ★ 3 | OPEN |
 | D6.3 | What confirms a structure break | a) ★ candle **close** beyond the swing · b) wick beyond | OPEN |
-| D6.4 ❗ | Which layer may **trigger setups** | a) internal (faster, more frequent) · b) swing (slower, stronger) · c) either | OPEN |
+| D6.4 ❗ | Which layer may **trigger setups** | **a) internal** | DECIDED |
 | D6.5 | First break when the trend is still undefined | a) ★ labelled BOS; it cannot count as a CHoCH trigger · b) labelled CHoCH | OPEN |
 | D6.6 | Which swing a CHoCH must break | a) ★ the most recent confirmed opposite swing · b) the "strong" swing that produced the latest high or low | OPEN |
 
@@ -220,3 +220,5 @@ These questions set the remaining details.
 | 2026-09-25 | D5.2 | Decided: a) full futures day, 18:00–17:00 New York (= 17:00–16:00 Chicago) | Your answer |
 | 2026-09-25 | D15.2 | Decided: NY AM only | Your answer |
 | 2026-09-25 | D16.1 | Decided: NQ.ORB | Your answer |
+| 2026-09-25 | D1.1 | Reconfirmed: 08:00 Chicago (09:00 New York) is intended | Your answer |
+| 2026-09-25 | D6.4 | Decided: a) internal | Your answer |
