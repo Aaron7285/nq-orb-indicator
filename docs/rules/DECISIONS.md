@@ -78,14 +78,14 @@ engine still records touches and breaks for display.
 
 | ID | Question | Options | Status |
 |---|---|---|---|
-| D6.1 | **Swing** sensitivity (candles on each side needed to confirm a swing) | ★ 10 (a starting point, to be tuned after seeing it on your timeframe) | OPEN |
-| D6.2 | **Internal** sensitivity | ★ 3 | OPEN |
-| D6.3 | What confirms a structure break | a) ★ candle **close** beyond the swing · b) wick beyond | OPEN |
+| D6.1 | **Swing** sensitivity (candles on each side needed to confirm a swing) | **10** candles each side (swing layer) | DECIDED |
+| D6.2 | **Internal** sensitivity | **3** candles each side (internal layer) | DECIDED |
+| D6.3 | What confirms a structure break | **a) candle close** beyond the swing | DECIDED |
 | D6.4 ❗ | Which layer may **trigger setups** | **a) internal** | DECIDED |
-| D6.5 | First break when the trend is still undefined | a) ★ labelled BOS; it cannot count as a CHoCH trigger · b) labelled CHoCH | OPEN |
-| D6.6 | Which swing a CHoCH must break | a) ★ the most recent confirmed opposite swing · b) the "strong" swing that produced the latest high or low | OPEN |
-| D6.7 | What counts as the **shift** (Event 2) in T1/T3 | a) internal **CHoCH only**: the internal trend must flip · b) **BOS or CHoCH**: any internal break in the setup's direction | OPEN |
-| D6.8 | What counts as the **BOS** (Event 2) in T2 | a) **BOS only**: the internal trend must already point in the breakout direction · b) **BOS or CHoCH**: the first internal break in the breakout direction | OPEN |
+| D6.5 | First break when the trend is still undefined | **a) labelled BOS**; cannot count as a CHoCH trigger | DECIDED |
+| D6.6 | Which swing a CHoCH must break | **a) the most recent confirmed opposite swing** | DECIDED |
+| D6.7 | What counts as the **shift** (Event 2) in T1/T3 | **a) internal CHoCH only** (the internal trend must flip) | DECIDED |
+| D6.8 | What counts as the **BOS** (Event 2) in T2 | **a) internal BOS only** (the internal trend must already point in the breakout direction) | DECIDED |
 
 **Delay note:** a swing is only confirmed after the D6.1/D6.2 number of candles closes
 to its right. On a 1m chart with sensitivity 10, a swing is known 10 minutes after it forms.
@@ -282,3 +282,10 @@ These questions set the remaining details.
 | 2026-09-25 | D5.11 | Decided: b) swing-layer points | Group 2 answer |
 | 2026-09-25 | D5.12 | Decided: b) active until swept or broken, whatever its age (limited in practice by loaded chart history) | Group 2 answer |
 | 2026-09-25 | D6.7–D6.8 | Added: which break types count as Event 2 for T1/T3 and T2 | Gap found while reviewing Group 3 |
+| 2026-09-25 | D6.1 | Decided: 10 candles each side (swing layer) | Group 3 answer |
+| 2026-09-25 | D6.2 | Decided: 3 candles each side (internal layer) | Group 3 answer |
+| 2026-09-25 | D6.3 | Decided: a) candle close beyond the swing | Group 3 answer |
+| 2026-09-25 | D6.5 | Decided: a) labelled BOS; cannot count as a CHoCH trigger | Group 3 answer |
+| 2026-09-25 | D6.6 | Decided: a) the most recent confirmed opposite swing | Group 3 answer |
+| 2026-09-25 | D6.7 | Decided: a) internal CHoCH only (the internal trend must flip) | Group 3 answer |
+| 2026-09-25 | D6.8 | Decided: a) internal BOS only (the internal trend must already point in the breakout direction) | Group 3 answer |
