@@ -151,7 +151,7 @@ retest level and wait for a later candle to reach it.
 | ID | Question | Options | Status |
 |---|---|---|---|
 | D11.1 | Stop for **T1/T3** (reversals) | a) ★ beyond the sweep extreme (if price goes past it, the sweep has failed) · b) beyond the swing the shift started from · c) the farther of a and b · d) ATR multiple | OPEN |
-| D11.2 ❗ | Stop for **T2** (breakout continuation), if T2 is enabled | a) beyond the swing the BOS started from · b) ORB midpoint · c) opposite ORB side · d) ATR multiple | OPEN |
+| D11.2 ❗ | Stop for **T2** (breakout continuation), if T2 is enabled | **a) beyond the internal swing where the BOS move started** (plus the D11.3 buffer) | DECIDED |
 | D11.3 | Stop **buffer** | ★ 2 ticks | OPEN |
 | D11.4 ❗ | **Maximum** stop: larger stops mean no setup | a) none · b) X points | OPEN |
 | D11.5 ❗ | **Minimum** stop | a) none · b) X points (smaller stops are rejected) | OPEN |
@@ -237,3 +237,4 @@ These questions set the remaining details.
 | 2026-09-25 | D10.4 | Decided: b) FVG 50 %; with several FVGs, use the most recent one closest to price | Your answer |
 | 2026-09-25 | D10.7 | Decided: 30 minutes | Your answer |
 | 2026-09-25 | D2.4 | Added and decided: durations in minutes; D4.2, D9.2 and D14.3 restated in minutes | Your answer (with D10.7) |
+| 2026-09-25 | D11.2 | Decided: a) T2 stop beyond the internal swing the BOS move started from | Your answer |
