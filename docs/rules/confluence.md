@@ -35,6 +35,22 @@ combination. *ORB state + session + bias* can never produce a setup.
 **Fixed rule C-2:** a single core event is never enough. Every setup type needs **two
 core events in a defined order** (§4).
 
+### Optional items and M (decided: D9.8, D9.9, D9.11, D9.12)
+
+A setup needs **at least M = 1** ✓ from the optional items below, **in addition to** its
+two core events and every required item. An item that is already required (e.g. the
+location that meets D9.4) doesn't count toward M.
+
+| Optional item | ✓ when |
+|---|---|
+| Bias agrees | Bias (swing trend + VWAP from 08:30 Chicago, both agreeing) points in the setup's direction. A counter-bias setup still forms, but is flagged "counter-bias" (D9.8). |
+| Supply/demand zone | Per D9.4 / D7 (definition pending the remaining D7 answers) |
+| FVG | Per D8.4 |
+| Different key level | The setup is at a key level **other than** the one used by its two core events (D9.11) |
+
+**ORB position** (above / inside / below) is shown on the checklist but is **never counted**
+toward M, because it's fixed by setup type (D9.12).
+
 **Fixed rule C-3:** setups are triggered by **events** (something that happens once, on a
 specific candle), never by **states** (something that stays true, like "price is above
 the ORB"). This is the main protection against signal spam; see `setup_lifecycle.md`.
