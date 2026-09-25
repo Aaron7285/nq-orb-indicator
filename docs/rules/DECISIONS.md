@@ -67,6 +67,9 @@ Status key: `OPEN` · `DECIDED` · `CHANGED` (decided, then revised; see change 
 | D5.7 | **Touch** tolerance: price gets this close without a sweep, and it's recorded as a touch | ★ 2 ticks | OPEN |
 | D5.8 | **EQH/EQL** tolerance: how close two swing highs/lows must be to count as "equal" | a) X ticks · b) k × ATR · c) ★ whichever is larger (e.g. 4 ticks or 0.1 × ATR(14)) | OPEN |
 | D5.9 | Can a pool be swept more than once? | a) ★ no: a pool is used up by its first sweep · b) yes | OPEN |
+| D5.10 | Which levels can be **targets** (TP1/TP2, D12.1/D12.2) | a) the same list as D5.1 · b) the D5.1 list **plus** untouched swing-layer highs/lows, used as targets only (they can't trigger sweeps) | OPEN |
+| D5.11 | **EQH/EQL** are built from which swing points | a) internal (many EQH/EQL, so more sweep triggers and targets) · b) swing (few, more significant) | OPEN |
+| D5.12 | How long an untouched EQH/EQL (and a swing target, if D5.10 b) stays active | a) current futures day only · b) until swept or broken, whatever its age | OPEN |
 
 ★ D5.4a/D5.5c: stricter definitions give fewer, clearer sweeps. The level-interaction
 engine still records touches and breaks for display.
@@ -264,3 +267,4 @@ These questions set the remaining details.
 | 2026-09-25 | D4.1 | Decided: a) confirmed breakout, then a close back inside the range within D4.2 | ★ accepted (Group 1) |
 | 2026-09-25 | D4.2 | Decided: 15 minutes (3 candles on 5m) | ★ accepted (Group 1) |
 | 2026-09-25 | D4.3 | Decided: a) recorded as an "ORB sweep" (liquidity event, separate from a false breakout) | ★ accepted (Group 1) |
+| 2026-09-25 | D5.10–D5.12 | Added: target level list, EQH/EQL source layer, EQH/EQL lifetime | Gaps found while reviewing Group 2 |
