@@ -245,4 +245,5 @@ more or fewer setups. A day with zero setups is a valid result.
 | 2026-09-25 | Phase 1 / core | L0 | PASS | Build, lint (10 files, 0 problems) and 32 tool tests pass |
 | 2026-09-25 | Phase 1 / core | L1 + L2 | PASS | CORE 31/31 PASS in TradingView; PX-04: diff 0 over 5554 candles, 0 start mismatches (screenshot from you) |
 | 2026-09-25 | Phase 2 / sessions | L0 | PASS | Build, lint (13 files, 0 problems), 32 tool tests |
-| — | Phase 2 / sessions | L1 + L2 + L6 | *waiting for you* | `dist/test/sessions_test.pine` (expect **SESSIONS 13/13 PASS**); updated `dist/NQ_ORB.pine` shows Asia/London outlines |
+| 2026-09-25 | Phase 2 / sessions | L1 + L2 | PASS | SESSIONS 13/13 PASS in TradingView (screenshot from you) |
+| — | Phase 2 / sessions | L6 (visual) | *waiting for you* | Updated `dist/NQ_ORB.pine` on NQ1! 5m/1m: faint Asia/London outlines |
