@@ -119,7 +119,7 @@ setup, alone or together.
 | D9.3 | Several sweeps before one shift (e.g. Asia low, then PDL, then CHoCH) | a) ★ all attach to the setup and are used up; the stop goes beyond the most extreme one · b) only the most recent attaches | OPEN |
 | D9.4 | **Location** requirement (zone, FVG, key level) | a) ★ at least one location factor required · b) location is shown on the checklist only · c) a specific one is required (say which) | OPEN |
 | D9.5 | **Session** filter | a) ★ hard filter: setups form only inside sessions you mark as tradeable (D15.2) · b) checklist item only | OPEN |
-| D9.6 ❗ | **Bias** components (choose any) | swing-structure trend · price vs VWAP (anchored to which session?) · price vs the day's open (which open time?) | OPEN |
+| D9.6 ❗ | **Bias** components (choose any) | **Swing-structure trend + price vs VWAP**, VWAP anchored at **08:30 Chicago** | DECIDED |
 | D9.7 | Bias rule | a) ★ all enabled components must agree, otherwise bias = neutral · b) majority | OPEN |
 | D9.8 ❗ | Setups **against the bias** | a) blocked · b) allowed and flagged "counter-bias" · c) bias is shown only, never used as a filter. **Note:** T1/T3 reversals start against the existing trend, so (a) can block them. | OPEN |
 | D9.9 ❗ | Minimum number of **optional** checklist factors (M) | a number; 0 is valid | OPEN |
@@ -224,3 +224,4 @@ These questions set the remaining details.
 | 2026-09-25 | D6.4 | Decided: a) internal | Your answer |
 | 2026-09-25 | D7.3 | Decided: a) break structure (internal layer) | Your answer |
 | 2026-09-25 | D9.1 | Decided: T1, T2 and T3 enabled | Your answer |
+| 2026-09-25 | D9.6 | Decided: swing-structure trend + price vs VWAP (anchor 08:30 Chicago) | Your answer |
