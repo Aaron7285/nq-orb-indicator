@@ -21,20 +21,20 @@ Status key: `OPEN` · `DECIDED` · `CHANGED` (decided, then revised; see change 
 
 | ID | Question | Options | Status |
 |---|---|---|---|
-| D1.1 ❗ | ORB **start time** | Your answer (e.g. 08:00, 09:30). Nothing is assumed. | OPEN |
-| D1.2 ❗ | **Timezone** for the ORB (and for sessions, unless D15.3 says otherwise) | a) New York (America/New_York) · b) Chicago (America/Chicago, the CME exchange time). **Note:** 8:00 New York = 7:00 Chicago, and 8:00 Chicago = 9:00 New York. Both adjust for daylight saving automatically. | OPEN |
+| D1.1 ❗ | ORB **start time** | **08:00** (Chicago time, per D1.2) = 09:00 New York | DECIDED |
+| D1.2 ❗ | **Timezone** for the ORB (and for sessions, unless D15.3 says otherwise) | **b) Chicago** (America/Chicago) | DECIDED |
 | D1.3 | How the ORB **end** is defined | a) ★ start + length preset (5/15/30/60 min) · b) an explicit end time you type | OPEN |
 | D1.4 | Default ORB **length** | 15 minutes (from your scope message); 5/15/30/60 selectable | DECIDED |
-| D1.5 ❗ | **ORB trading window end**: time after which no ORB-based setup may form | e.g. 10:30, 11:00, 12:00, session end | OPEN |
+| D1.5 ❗ | **ORB trading window end**: time after which no ORB-based setup may form | **11:00 Chicago** (= 12:00 New York) | DECIDED |
 | D1.6 | How many opening ranges | a) ★ one configurable ORB (simpler, cleaner chart) · b) two independent ORBs (e.g. 08:00 and 09:30) | OPEN |
 
 ## D2 — Chart timeframes and account
 
 | ID | Question | Options | Status |
 |---|---|---|---|
-| D2.1 ❗ | Timeframe(s) **you trade** on | e.g. 1m, 2m, 3m, 5m | OPEN |
-| D2.2 | Timeframes **officially supported and tested** | ★ 1m, 2m, 3m, 5m, 15m. Higher timeframes show a warning. | OPEN |
-| D2.3 ❗ | Your **TradingView plan** | Free / Essential / Plus / Premium / other. This decides how many days of 1-minute history load, which matters for previous-day levels and testing. | OPEN |
+| D2.1 ❗ | Timeframe(s) **you trade** on | **5m primary**; 1m also used | DECIDED |
+| D2.2 | Timeframes **officially supported and tested** | **1m and 5m** (from the D2.1 answer). Other timeframes are untested and show a notice. | DECIDED |
+| D2.3 ❗ | Your **TradingView plan** | **Pro** | DECIDED |
 
 ## D3 — Breakout confirmation (ORB)
 
@@ -58,7 +58,7 @@ Status key: `OPEN` · `DECIDED` · `CHANGED` (decided, then revised; see change 
 | ID | Question | Options | Status |
 |---|---|---|---|
 | D5.1 | Which levels are **liquidity pools that can anchor a setup** (choose any) | PDH/PDL · previous-session H/L (which sessions?) · EQH/EQL · ORB H/L · swing-layer highs/lows · internal highs/lows. ★ PDH/PDL, Asia H/L, London H/L, EQH/EQL, ORB H/L. Raw swing points are excluded to keep setups meaningful. | OPEN |
-| D5.2 ❗ | "Previous day" means | a) the full futures day (18:00–17:00 New York) · b) the regular session (09:30–16:00 New York) | OPEN |
+| D5.2 ❗ | "Previous day" means | **a) full futures day**, 18:00–17:00 New York (= 17:00–16:00 Chicago) | DECIDED |
 | D5.3 | **Minimum penetration** beyond a level for a sweep | a) 1 tick · b) ★ 2 ticks · c) fraction of ATR | OPEN |
 | D5.4 | **Close-back** requirement | a) ★ the **same candle** must close back on the original side · b) within N candles (then it's also a "failed break") | OPEN |
 | D5.5 | **Rejection-strength** filter | a) none (close-back only) · b) the wick beyond the level ≥ X % of the candle range · c) ★ the candle closes in the half of its range away from the level | OPEN |
@@ -194,14 +194,14 @@ These questions set the remaining details.
 | ID | Question | Options | Status |
 |---|---|---|---|
 | D15.1 | Session times (each can be switched on/off) | Proposed (New York time): Asia 20:00–00:00 · London 02:00–05:00 · New York 09:30–16:00 · NY AM 09:30–12:00 · NY PM 13:30–16:00. Confirm or edit. | OPEN |
-| D15.2 ❗ | Which sessions are **tradeable** (setups may form) | e.g. NY AM only | OPEN |
+| D15.2 ❗ | Which sessions are **tradeable** (setups may form) | **NY AM only** | DECIDED |
 | D15.3 | Define each session in its **own local time** (London in London time, Asia in Tokyo time) | a) ★ yes: stays correct during the weeks when US and European clocks change on different dates · b) no: all sessions use the D1.2 timezone | OPEN |
 
 ## D16 — Other
 
 | ID | Question | Options | Status |
 |---|---|---|---|
-| D16.1 ❗ | Indicator **name** shown in TradingView | Working name: "NQ Intraday System" | OPEN |
+| D16.1 ❗ | Indicator **name** shown in TradingView | **NQ.ORB** | DECIDED |
 
 ---
 
@@ -211,3 +211,12 @@ These questions set the remaining details.
 |---|---|---|---|
 | 2026-09-25 | D1.4 | Recorded 15 min default | From scope message |
 | 2026-09-25 | D1.1 | 9:30 default withdrawn; start time is now an open question | You may use an 8:00 ORB |
+| 2026-09-25 | D1.1 | Decided: 08:00 (Chicago time, per D1.2) = 09:00 New York | Your answer |
+| 2026-09-25 | D1.2 | Decided: b) Chicago (America/Chicago) | Your answer |
+| 2026-09-25 | D1.5 | Decided: 11:00 Chicago (= 12:00 New York) | Your answer |
+| 2026-09-25 | D2.1 | Decided: 5m primary; 1m also used | Your answer |
+| 2026-09-25 | D2.2 | Decided: 1m and 5m (from the D2.1 answer). Other timeframes are untested and show a notice. | Your answer |
+| 2026-09-25 | D2.3 | Decided: Pro | Your answer |
+| 2026-09-25 | D5.2 | Decided: a) full futures day, 18:00–17:00 New York (= 17:00–16:00 Chicago) | Your answer |
+| 2026-09-25 | D15.2 | Decided: NY AM only | Your answer |
+| 2026-09-25 | D16.1 | Decided: NQ.ORB | Your answer |
