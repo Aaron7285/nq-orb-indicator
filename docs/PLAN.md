@@ -1,7 +1,10 @@
-# NQ/MNQ Intraday System — Development Plan
+# NQ.ORB — Development Plan
 
-**Status:** Rules lock. Trading rules are being decided in `docs/rules/DECISIONS.md`.
-No Pine Script is written until the rules each module depends on are decided.
+An NQ/MNQ intraday trading indicator for TradingView, built around an 08:00 Chicago opening range.
+
+**Status:** Rules lock. All 104 trading decisions are recorded in `docs/rules/DECISIONS.md`;
+the complete rule set is summarized in `docs/rules/SUMMARY.md` and is **awaiting your final
+approval**. No Pine Script is written before that approval.
 **Architecture:** approved (modules + build tool), 2026-09-25.
 
 ---
@@ -69,10 +72,11 @@ nq-orb-indicator/
 │   ├── TESTING.md              test levels, self-test catalogue, results log
 │   ├── DESIGN.md               visual design system (Phase 0)
 │   └── rules/
-│       ├── DECISIONS.md        every open/decided trading rule
-│       ├── confluence.md       factor classes, setup types, qualification (draft)
-│       ├── setup_lifecycle.md  states, anti-spam rules, cooldown (draft)
-│       ├── entry_models.md     Model A, Model B, stops, targets, outcomes (draft)
+│       ├── DECISIONS.md        every trading decision, with a change log
+│       ├── SUMMARY.md          the complete rule set on one page
+│       ├── confluence.md       factor classes, setup types, qualification
+│       ├── setup_lifecycle.md  states, anti-spam rules, cooldown
+│       ├── entry_models.md     Model B (default), Model A, stops, targets, outcomes
 │       └── <module>.md         one per detector, written at the start of its phase
 ├── src/
 │   ├── core/                   shared types and helpers
@@ -82,7 +86,7 @@ nq-orb-indicator/
 │   ├── build.py                joins src/ into single TradingView files
 │   └── lint.py                 automatic repaint and safety checks
 └── dist/                       ← the only folder you copy from into TradingView
-    ├── NQ_System.pine          the full product
+    ├── NQ_ORB.pine             the full product (indicator name: NQ.ORB)
     └── test/                   one standalone test indicator per module
 ```
 
@@ -150,36 +154,39 @@ It's built only from decided answers:
 
 ## 5. Confluence: core requirements (summary of `rules/confluence.md`)
 
-- Factors belong to three classes: **Core events** (sweep, structure shift, ORB breakout,
-  ORB failure), **Location** (zone, FVG, key level) and **Context** (session, bias,
-  ORB state).
-- **Context can never create a setup**, alone or together (so ORB state + session + bias
-  never creates one).
-- **One core event is never enough.** Every setup type needs two core events in a fixed
-  order within a time limit:
-  - **T1 Sweep → Shift**
-  - **T2 ORB Breakout → BOS**
-  - **T3 ORB Failure → Shift**
-- Location can be required (D9.4). Context acts as filters (D9.5, D9.8).
-- Display is a ✓/✗ checklist of facts. There's no score.
+- Factors belong to three classes: **Core events** (liquidity sweep, ORB sweep, ORB
+  breakout, ORB false breakout, internal BOS, internal CHoCH), **Location** (FVG, zone,
+  key level) and **Context** (session, bias, ORB position).
+- **Context can never create a setup**, alone or together.
+- Every setup needs **two core events in order**, the second within 50 minutes:
+  - **T1 Sweep → internal CHoCH**
+  - **T2 ORB Breakout → internal BOS**
+  - **T3 ORB Failure → internal CHoCH**
+- Setups form only in **NY AM (08:30–11:00 Chicago)**. At least one location item is
+  required, plus **M = 1** further ✓ (bias, zone or a different key level).
+- Counter-bias setups are allowed and **flagged**. The display is a ✓/✗ checklist of
+  facts, never a score.
 
 ## 6. Setup lifecycle (summary of `rules/setup_lifecycle.md`)
 
-- States: `ARMED → QUALIFIED → (PENDING →) ACTIVE → terminal → COOLDOWN → ARMED`.
-- One setup per event. Events are **used** once attached to any setup or rejected candidate.
-- Only one live setup at a time. Price moving against a setup can only stop or invalidate
-  it; it can never create the opposite setup.
-- An opposite setup requires **new** events confirmed after the re-arm time.
-- A configurable cooldown, plus caps per session and per day.
+- States: `ARMED → CANDIDATE → PENDING → ACTIVE → outcome → COOLDOWN → ARMED`; a failed
+  check is `REJECTED` (logged, events used up, no cooldown).
+- One live setup at a time. Events are used once, forever.
+- A **30-minute cooldown** follows every outcome. Only events after it count.
+- At most **2 filled setups per morning**. Everything resets daily.
+- Price moving against a setup can only end it, never create the opposite setup.
 - Every rule is covered by self-tests (LT-series in `TESTING.md`).
 
 ## 7. Entry models (summary of `rules/entry_models.md`)
 
-- **Model A: Close Confirmation.** Entry is the close of the trigger candle. The setup is
-  active immediately, and outcomes are tracked from the next candle.
-- **Model B: Limit Retest.** At the trigger candle, a limit is fixed at the chosen retest
-  level. It fills only on a later candle, and can expire or be missed.
-- The system does **not** choose between them. You pick in settings (D10.1/D10.2).
+- **Model B: Limit Retest (default).**
+  - A limit at the 50 % level of the setup's own FVG, filled on a 1-tick trade-through.
+  - It expires after 30 minutes, and ends as MISSED if TP1 comes first.
+- **Model A: Close Confirmation** (setting). Entry at the trigger candle's close.
+- **Stop:** 5–30 points. **TP1 / TP2:** the nearest and the next untouched liquidity
+  levels, 2 ticks before each. Minimum R:R to TP1 is 1.0.
+- After TP1, the stop moves to **breakeven**. Anything still open is closed at **11:00
+  Chicago**.
 - Conservative conventions apply to same-candle ambiguity (e.g. stop and target both hit
   is counted as stopped).
 
@@ -220,14 +227,14 @@ It's built only from decided answers:
 3. **Test:** levels L0–L8 in `TESTING.md`. **You run the TradingView steps.**
 4. **Review:** Claude checks the code against the rulebook, you check the visuals, and
    findings are logged.
-5. **Integrate:** the module is added to `dist/NQ_System.pine`, and the regression tests
+5. **Integrate:** the module is added to `dist/NQ_ORB.pine`, and the regression tests
    are re-run.
 
 ## 11. Phases
 
 | Phase | Deliverable | Depends on | Gate |
 |---|---|---|---|
-| **R** | **Rules lock:** answer `DECISIONS.md` (current step) | — | All D1–D16 decided |
+| **R** | **Rules lock:** answer `DECISIONS.md` ✓, approve `SUMMARY.md` and the rulebooks (current step) | — | All decided ✓ · your approval |
 | 0 | Tooling: build.py, lint.py, GitHub check, DESIGN.md, README | R | Build + lint pass |
 | 1 | Core: types, event IDs, time/tick/ATR helpers, level-interaction engine, drawing budget, self-test framework | 0 | Core self-tests pass |
 | 2 | Sessions | 1 | Module workflow (§10) |
@@ -264,7 +271,7 @@ Each phase ends with a version tag (v0.1, v0.2 …).
 
 ## 14. Getting it into TradingView
 
-1. On GitHub, open `dist/NQ_System.pine` (or a file in `dist/test/`), click **Raw**, and copy everything.
+1. On GitHub, open `dist/NQ_ORB.pine` (or a file in `dist/test/`), click **Raw**, and copy everything.
 2. In TradingView, open the **Pine Editor** at the bottom of the chart.
 3. Paste over the default code, click **Save**, then **Add to chart**.
 4. For updates, open the saved script, paste the new version and save again.

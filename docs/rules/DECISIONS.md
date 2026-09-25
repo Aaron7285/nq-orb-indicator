@@ -1,5 +1,7 @@
 # Trading Rules — Decision Register
 
+**Status:** all decisions made (2026-09-25). The complete rule set is summarized in `SUMMARY.md`.
+
 **Purpose:** every trading rule that could reasonably be defined in more than one way
 is listed here as a question. Nothing in this project is coded until the decisions it
 depends on are marked **DECIDED** with your answer.
@@ -211,10 +213,10 @@ These questions set the remaining details.
 
 | ID | Question | Options | Status |
 |---|---|---|---|
-| D15.1 | Session times (each can be switched on/off) | ★ Chicago time (New York time in brackets): Asia 19:00–23:00 (20:00–00:00) · London 01:00–04:00 (02:00–05:00) · New York 08:30–15:00 (09:30–16:00) · NY AM 08:30–11:00 (09:30–12:00) · NY PM 12:30–15:00 (13:30–16:00). Confirm or edit. | OPEN |
+| D15.1 | Session times (each can be switched on/off) | **Chicago time:** Asia 19:00–23:00 · London 01:00–04:00 · New York 08:30–15:00 · NY AM 08:30–11:00 · NY PM 12:30–15:00 | DECIDED |
 | D15.2 ❗ | Which sessions are **tradeable** (setups may form) | **NY AM only** | DECIDED |
-| D15.3 | Which clock each session follows | a) ★ all sessions in **Chicago time** (fixed clock times all year) · b) each in its **own local time** (London in London time, Asia in Tokyo time; Japan has no daylight saving, so Asia moves 1 hour in Chicago terms between US summer and winter) · c) London in London time, all others in Chicago time. **Correction:** the earlier ★ (own local time) overlooked that Japan has no daylight saving. | OPEN |
-| D15.4 | How long **PDH/PDL and Asia/London highs/lows** stay active as levels | a) ★ only the most recent ones: replaced each day (older unswept levels are still covered as swing targets, D5.10) · b) older ones stay until swept or broken, like EQH/EQL (D5.12) | OPEN |
+| D15.3 | Which clock each session follows | **a) all sessions in Chicago time** (fixed clock times all year) | DECIDED |
+| D15.4 | How long **PDH/PDL and Asia/London highs/lows** stay active as levels | **a) only the most recent ones**, replaced each day | DECIDED |
 
 ## D16 — Other
 
@@ -338,3 +340,6 @@ These questions set the remaining details.
 | 2026-09-25 | D14.7 | Decided: a) never re-evaluated: each event combination is checked exactly once | Group 6 answer |
 | 2026-09-25 | D14.13 | Decided: No: a rejection uses up its events but does not start a cooldown | Group 6 answer |
 | 2026-09-25 | D15.1, D15.3, D15.4 | Session times restated in Chicago time; D15.3 suggestion corrected (Japan has no DST); added D15.4 level lifetime | Found while reviewing Group 7 |
+| 2026-09-25 | D15.1 | Decided: Chicago time: Asia 19:00–23:00 · London 01:00–04:00 · New York 08:30–15:00 · NY AM 08:30–11:00 · NY PM 12:30–15:00 | Group 7 answer |
+| 2026-09-25 | D15.3 | Decided: a) all sessions in Chicago time (fixed clock times all year) | Group 7 answer |
+| 2026-09-25 | D15.4 | Decided: a) only the most recent ones, replaced each day | Group 7 answer |

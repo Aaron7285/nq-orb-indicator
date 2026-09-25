@@ -1,131 +1,134 @@
-# Rulebook — Confluence Engine (DRAFT)
+# Rulebook — Confluence Engine
 
-**Status:** DRAFT. Parameters marked `Dx.y` are open in `DECISIONS.md`. This rulebook
-can't be approved until they are decided.
+**Status:** every input is decided (see `DECISIONS.md`). **Awaiting your final approval.**
+Items marked *(derived)* are precise definitions needed to apply your decisions; they're
+listed in `SUMMARY.md` §9 for approval.
 **Built in:** Phase 8. **Depends on:** all detector modules.
+All times are **Chicago time** (D1.2, D15.3).
 
 ## 1. Purpose
 
-The confluence engine decides whether a combination of **market events** is strong
-enough to become a setup. It is a **checklist, not a score**. There are no weights,
-percentages, "probabilities" or AI ratings. Every item is a yes/no condition with a
-written rule behind it.
+The confluence engine decides whether a combination of **market events** becomes a
+setup. It is a **checklist, not a score**. There are no weights, percentages,
+"probabilities" or AI ratings. Every item is a yes/no condition with a written rule.
 
 ## 2. Quality principle
 
-The system is designed to produce **few, meaningful setups**. Defaults are strict.
-Setup count is **never** a goal and is never tuned upward. A day with no setups is
-a normal, valid result. Setup counts are recorded during testing **only** to catch
-spam bugs (see `TESTING.md`).
+The system is designed to produce **few, meaningful setups**. Setup count is never a
+goal and is never tuned upward. A morning with no setups is a normal, valid result.
 
 ## 3. Factor classes
 
-Every factor belongs to exactly one class. The class decides what the factor is allowed
-to do.
-
-| Class | Factors | Can create a setup? |
+| Class | Items | Role |
 |---|---|---|
-| **Core events** | Liquidity sweep (of an eligible pool, D5.1) · Structure shift (BOS/CHoCH on the trigger layer, D6.4) · ORB breakout (D3) · ORB false breakout / ORB sweep (D4) | **Yes**, but only in the combinations defined by a setup type (§4) |
-| **Location** | Active supply/demand zone · FVG (D8.4) · key level (PDH/PDL, session H/L, ORB level) | No. It can be required (D9.4). |
-| **Context** | Session · Bias · ORB state (above / inside / below) | **Never** (fixed rule). It can only filter or inform. |
+| **Core events** | Liquidity sweep · ORB sweep · ORB breakout · ORB false breakout · internal BOS · internal CHoCH | Only these can complete a setup, and only in the sequences of §4 |
+| **Location** | FVG from the setup's own move · supply/demand zone ✓ · different key level ✓ | At least one required (D9.4); the rest count toward M |
+| **Context** | Session · bias · ORB position | Never creates a setup. Session is a hard filter; bias is flagged; ORB position is shown only. |
 
-**Fixed rule C-1:** context factors can never create a setup, alone or in any
-combination. *ORB state + session + bias* can never produce a setup.
+### 3.1 Core event definitions
 
-**Fixed rule C-2:** a single core event is never enough. Every setup type needs **two
-core events in a defined order** (§4).
+| Event | Definition | Decisions |
+|---|---|---|
+| **Liquidity sweep** | On one closed candle, the wick goes ≥ **2 ticks** beyond an eligible level, the candle **closes back** on the original side, and the close is in the half of the candle's range **away from** the level. A close exactly at the midpoint counts *(derived)*. | D5.3–D5.5 |
+| Eligible levels | Previous full futures day high/low (17:00–16:00) · most recent Asia high/low (19:00–23:00) · most recent London high/low (01:00–04:00) · EQH/EQL (swing-layer points within max(4 ticks, 0.1 × ATR(14))) · ORB high/low. A level is used up by its first sweep or break. | D5.1, D5.2, D5.8, D5.9, D5.11, D15.1, D15.4 |
+| **ORB** | 08:00–08:15 (15 min; 5/15/30/60 selectable). High, low and midpoint are locked at 08:15. | D1.1–D1.4 |
+| **ORB breakout** | The first candle **close** beyond the ORB high (or low) after 08:15 and before 11:00. One per side per day. | D3.1, D3.2, D1.5 |
+| **ORB false breakout** | An ORB breakout, then a candle closes back inside the range within **15 minutes**. | D4.1, D4.2 |
+| **ORB sweep** | A wick through the ORB high/low that closes inside the range, without a confirmed breakout. | D4.3 |
+| **Internal BOS / CHoCH** | A candle **close** beyond the most recent confirmed internal swing (sensitivity **3**). BOS = in the direction of the internal trend; CHoCH = against it (the trend flips). The first break with no trend yet is a BOS. | D6.2, D6.3, D6.5, D6.6 |
 
-### Optional items and M (decided: D9.8, D9.9, D9.11, D9.12)
+Every internal break is either a BOS or a CHoCH, never both, so one break can complete a
+T2 **or** a T1/T3 setup, never both.
 
-A setup needs **at least M = 1** ✓ from the optional items below, **in addition to** its
-two core events and every required item. An item that is already required (e.g. the
-location that meets D9.4) doesn't count toward M.
+## 4. Setup types (all three enabled, D9.1)
 
-| Optional item | ✓ when |
-|---|---|
-| Bias agrees | Bias (swing trend + VWAP from 08:30 Chicago, both agreeing) points in the setup's direction. A counter-bias setup still forms, but is flagged "counter-bias" (D9.8). |
-| Supply/demand zone | Per D9.4 / D7 (definition pending the remaining D7 answers) |
-| FVG | Per D8.4 |
-| Different key level | The setup is at a key level **other than** the one used by its two core events (D9.11) |
+Every type needs **two core events in order**, with Event 2 confirmed **within 50
+minutes** after Event 1 (D9.2). The **trigger candle** is the candle whose close
+confirms Event 2.
 
-**ORB position** (above / inside / below) is shown on the checklist but is **never counted**
-toward M, because it's fixed by setup type (D9.12).
+| Type | Event 1 | Event 2 | Direction |
+|---|---|---|---|
+| **T1 Sweep → CHoCH** | A liquidity sweep (any eligible level) | An **internal CHoCH** against the swept side (D6.7) | Sweep of lows → long; sweep of highs → short |
+| **T2 ORB Breakout → BOS** | An ORB breakout | An **internal BOS** in the breakout direction (D6.8), with no ORB false breakout in between | With the breakout |
+| **T3 ORB Failure → CHoCH** | An ORB false breakout or ORB sweep | An **internal CHoCH** back toward the range | Against the failed side |
 
-**Fixed rule C-3:** setups are triggered by **events** (something that happens once, on a
-specific candle), never by **states** (something that stays true, like "price is above
-the ORB"). This is the main protection against signal spam; see `setup_lifecycle.md`.
-
-## 4. Setup types: the explicit core requirements
-
-Each type names its two required core events, their order and their time limit.
-Which types are enabled is decision **D9.1**.
-
-### T1 — Sweep → Shift (reversal)
-1. **Event 1:** a liquidity sweep of an eligible pool (D5.1), by the sweep rules (D5.3–D5.6).
-2. **Event 2:** a structure shift **in the opposite direction** to the swept side, on the
-   trigger layer (D6.4), confirmed within N candles of Event 1 (D9.2).
-   - A sweep of lows (sell-side) followed by a bullish shift gives a **long**.
-   - A sweep of highs (buy-side) followed by a bearish shift gives a **short**.
-3. **Trigger candle:** the candle whose close confirms Event 2.
-4. Several sweeps before one shift: D9.3.
-
-### T2 — ORB Breakout → BOS (continuation)
-1. **Event 1:** an ORB breakout (D3.1) inside the ORB trading window (D1.5).
-2. **Event 2:** a BOS **in the same direction** on the trigger layer, confirmed within N
-   candles (D9.2), with no ORB false breakout (D4) in between.
-3. **Trigger candle:** the candle whose close confirms Event 2.
-4. The breakout alone is **never** enough (C-2).
-
-### T3 — ORB Failure → Shift (reversal)
-1. **Event 1:** an ORB false breakout (D4.1) or an ORB sweep (D4.3).
-2. **Event 2:** a structure shift back toward the inside of the range, on the trigger
-   layer, within N candles (D9.2).
-3. **Trigger candle:** the candle whose close confirms Event 2.
-
-### Overlap between types
-If ORB H/L are liquidity pools (D5.1), an ORB sweep followed by a shift matches both T1
-and T3. **Only one setup is created** (LC-1). Its label is decided by D9.10.
+- **Several sweeps before one CHoCH:** all attach, all are used up, and the stop goes
+  beyond the most extreme one (D9.3).
+- **Overlap:** an ORB sweep followed by a CHoCH matches T1 and T3. One setup is created,
+  labelled **T3** (D9.10).
+- **Event 1 before 08:30:** an event between 08:15 and 08:30 (e.g. an ORB breakout) can
+  serve as Event 1. The trigger candle must still be inside NY AM (§5 step 2).
 
 ## 5. Qualification: exact order of checks
 
-On each **closed** candle, while the lifecycle state is `ARMED` (see `setup_lifecycle.md`):
+On each **closed** candle, while the lifecycle state is `ARMED`:
 
-1. **Core gate:** did an enabled setup type's Event 2 confirm on this candle, with an
-   eligible (unused, new enough, D14.4) Event 1 inside its time limit? If not, stop here.
-   Nothing happens, and nothing is recorded.
-2. **Location:** is the location requirement met (D9.4)?
-3. **Context filters:** is the time inside a tradeable session (D9.5, D15.2), inside the ORB
-   window for T2/T3 (D1.5), and does the bias allow it (D9.8)?
-4. **Trade plan:** can a valid plan be built? That means a valid stop (D11), a valid
-   retest level for Model B (D10.5), stop size within limits (D11.4/5) and minimum R:R (D12.3).
-5. **Caps:** is it within the per-session and per-day limits (D14.8/9)?
-6. **Optional factors:** are at least M optional factors true (D9.9)?
+1. **Core gate:** Event 2 of an enabled type confirmed on this candle, with an eligible
+   Event 1 that is unused, confirmed **after the re-arm time** (D14.4) and no more than 50
+   minutes earlier. If not, nothing happens and nothing is recorded.
+2. **Session:** the trigger candle opens at or after 08:30 and closes at or before 11:00
+   (NY AM, a hard filter; D9.5, D15.2) *(derived: session membership)*.
+3. **Entry FVG (Model B):** a qualifying FVG exists:
+   - It's in the setup's **own move**: from the stop-anchor point up to and including the
+     trigger candle (D8.4, D8.5).
+   - Its size is ≥ max(2 points, 0.25 × ATR(14)) (D8.1), and it isn't filled (D8.2).
+   - If several qualify, the **most recent one, closest to price** is used (D10.4).
+   - If the only candidate is the gap created by the trigger candle itself, the check
+     waits **one more candle** for that gap to confirm (D8.6). Steps 3–7 then run on that
+     **plan candle**, still exactly once.
+   - No qualifying FVG → REJECTED "no FVG" (D10.5).
+   - If the plan candle would close after 11:00 → REJECTED "window ended" *(derived)*.
+4. **Location:** at least one location item ✓ (D9.4). With Model B, the entry FVG always
+   meets this.
+5. **Trade plan** (`entry_models.md`):
+   - The stop distance is 5–30 points, buffer included (D11.4, D11.5).
+   - TP1 exists (D12.1).
+   - R:R to TP1 is ≥ 1.0 (D12.3).
+   - The limit lies between the stop and the plan-candle close.
+6. **Cap:** fewer than **2 filled** setups so far this morning (D14.8, D14.9).
+7. **Optional items:** at least **M = 1** ✓ beyond the required location (§6).
 
-- If 1–6 all pass, the setup is **QUALIFIED** and the lifecycle takes over.
-- If 1 passes but any of 2–6 fails, the result is **REJECTED**. The reason is recorded,
-  and the events are handled per D14.7.
+- If every step passes, the setup is **QUALIFIED**.
+- If any step 2–7 fails, it's **REJECTED** with the reason. Its events are used up, it is
+  never re-evaluated (D14.7), and no cooldown starts (D14.13).
 
-## 6. Checklist display
+**Counter-bias setups are not blocked.** They're flagged **"counter-bias"** (D9.8).
 
-The checklist lists every factor with ✓ / ✗ and a short fact, for example:
+## 6. Checklist items and counting M
 
+**Counting rule** *(derived)*: the location requirement is met by **one** location item;
+every **other** ✓ item below counts toward M.
+
+| Item | ✓ when | Decisions |
+|---|---|---|
+| FVG | A qualifying FVG from the setup's own move exists (always true for a Model B setup that passed step 3) | D8.4, D8.5 |
+| Zone | The stop-anchor point **or** the limit entry lies inside an active supply/demand zone of the setup's direction | D7.8 |
+| Different key level | The stop-anchor point **or** the limit entry is within max(4 ticks, 0.1 × ATR(14)) of an eligible level **other than** the one used by the core events. Swept or broken levels still count. | D9.11, D9.13 |
+| Bias agrees | Swing trend and price-vs-VWAP (anchored 08:30) **both** point in the setup's direction | D9.6, D9.7 |
+| ORB position | Shown only; **never counted** | D9.12 |
+
+In practice, with Model B the FVG meets the location requirement, so M = 1 means **at
+least one of: zone, different key level, bias agrees.**
+
+**Supply/demand zone definition** (D7.1–D7.7):
+- A zone is the last opposite-colored candle before a displacement candle with a
+  body ≥ 1.5 × ATR(14), and the displacement must break internal structure.
+- It covers that candle wick to wick.
+- It's invalidated by a close beyond its far edge, and retired after 2 tests.
+- At most 2 zones are shown per side.
+
+Example checklist:
 ```
-LONG · T1 Sweep → Shift
-✓ Sweep     PDL swept 08:47
-✓ Shift     internal CHoCH ↑ 08:52
-✓ Location  bullish FVG (own displacement)
-✓ Session   NY AM
-✗ Bias      neutral
-Optional 1/3
+LONG · T1 Sweep → CHoCH                         counter-bias
+✓ Sweep     London low swept 08:47
+✓ CHoCH     internal ↑ 08:55
+✓ FVG       08:50–08:55 gap (entry at 50 %)       ← location
+✓ Zone      entry inside demand zone             ← counts: 1/1
+✗ Level     —
+✗ Bias      bearish (swing ↓, below VWAP)
+· ORB       inside range (not counted)
 ```
 
-It shows **only facts**. It never shows words like "strong", "high probability" or "A+".
+## 7. Self-tests (full list in TESTING.md §3.5)
 
-## 7. Self-tests (summary; full list in TESTING.md)
-
-- CT-01: ORB breakout + session + bullish bias, no second core event → **no setup**.
-- CT-02: Event 2 comes before Event 1 → **no setup**.
-- CT-03: Event 2 later than N candles after Event 1 → **no setup**.
-- CT-04: core gate passes, location missing (D9.4a) → **REJECTED**, reason "location".
-- CT-05: a valid T1 sequence → exactly **one** QUALIFIED setup, with the correct events attached.
-- CT-06: a T2 sequence interrupted by a false breakout → **no setup**.
+CT-01 … CT-14.

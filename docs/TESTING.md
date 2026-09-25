@@ -11,7 +11,7 @@ automatic checks and the self-tests. **You run the TradingView steps** and repor
 | Level | Test | Pass when | Who |
 |---|---|---|---|
 | L0 | Automatic checks | `build.py` and `lint.py` succeed; the GitHub check shows ✓ | Automatic |
-| L1 | Compile | The module's test indicator **and** the full build add to the chart with no errors | You |
+| L1 | Compile | The module's test indicator **and** the full build (`dist/NQ_ORB.pine`) add to the chart with no errors | You |
 | L2 | Self-tests | The test indicator's PASS/FAIL table shows every row as **PASS** | You |
 | L3 | Real-chart checks | On the listed dates, Data Window values match a manual reading of the chart | You |
 | L4 | Repaint checks | Bar Replay and the reload test show identical results (§4) | You |
@@ -27,7 +27,7 @@ automatic checks and the self-tests. **You run the TradingView steps** and repor
 3. **Test:** L0 → L8, in order. A failure stops the phase until it's fixed.
 4. **Review:** Claude checks the code against every rulebook line, you check the visuals,
    and findings are logged in §7.
-5. **Integrate:** the module is added to `dist/NQ_System.pine`, then L1, L7 and L8 are re-run.
+5. **Integrate:** the module is added to `dist/NQ_ORB.pine`, then L1, L7 and L8 are re-run.
 
 ## 3. Self-test catalogue
 
@@ -36,73 +36,102 @@ into the module and compares the result with the expected answer written in the 
 The IDs below are the minimum set. Each module's rulebook adds its own cases.
 
 ### 3.1 Core: level-interaction engine (LI)
-- LI-01: price comes within the touch tolerance without penetrating → **TOUCH**, not a sweep.
-- LI-02: wick through by ≥ the minimum penetration, closes back, meets the rejection filter → **SWEEP**.
-- LI-03: wick through by less than the minimum penetration → **TOUCH**.
-- LI-04: wick through, closes back, fails the rejection filter → **not a sweep**.
-- LI-05: closes beyond → **BREAK**; then closes back within N → **FAILED BREAK**.
-- LI-06: a level already swept (D5.9a) gets swept again → no second sweep event.
+Values: minimum penetration 2 ticks, touch tolerance 2 ticks, same-candle close-back, close in the half away from the level.
+- LI-01: the high comes within 2 ticks of a level without going through → **TOUCH**, and the level stays active.
+- LI-02: the wick goes 2+ ticks through, the same candle closes back, in the half of its range away from the level → **SWEEP**, and the level is used up.
+- LI-03: the wick goes 1 tick through, then closes back → **TOUCH**, not a sweep.
+- LI-04: the wick goes 2+ ticks through and closes back, but in the half **near** the level → **not a sweep**.
+- LI-05: a candle closes beyond the level → **BREAK**, and the level is used up.
+- LI-06: a level already swept is swept again → no second sweep event.
+- LI-07: the close is exactly at the candle midpoint → counts as "the half away" (derived rule R7).
 
 ### 3.2 Opening range (OR)
-- OR-01: high/low/midpoint match the scripted window exactly; locked at the window end.
-- OR-02: no breakout event while the range is forming.
-- OR-03: first close beyond → one breakout event; later closes beyond → none (D3.2a).
-- OR-04: breakout then close back inside within N → one false-breakout event.
-- OR-05: wick through, close inside, no breakout → an ORB sweep event (D4.3a).
-- OR-06: the start time is correct across a daylight-saving change.
+Values: 08:00–08:15 Chicago, breakouts until 11:00.
+- OR-01: high/low/midpoint match the scripted 08:00–08:15 candles exactly on 1m and 5m; locked at 08:15.
+- OR-02: no breakout, false-breakout or ORB-sweep event before 08:15.
+- OR-03: the first close above the ORB high → one breakout event; later closes above → none.
+- OR-04: a breakout, then a close back inside within 15 minutes → one false-breakout event; after 16+ minutes → none.
+- OR-05: a wick through the ORB high that closes inside, with no breakout → one ORB-sweep event.
+- OR-06: the ORB starts at 08:00 Chicago in both summer and winter time.
 
 ### 3.3 Structure (MS)
-- MS-01: a swing is confirmed exactly N candles after it forms, never earlier.
-- MS-02: close beyond the swing high in an uptrend → BOS; against the trend → CHoCH and the trend flips.
-- MS-03: a wick beyond without a close (D6.3a) → no break.
+Values: swing 10, internal 3, close-confirmed, CHoCH breaks the most recent opposite swing.
+- MS-01: an internal swing is confirmed exactly 3 candles after it forms (a swing-layer one after 10), never earlier.
+- MS-02: a close beyond an internal swing high in an internal uptrend → internal **BOS**; against the trend → internal **CHoCH**, and the trend flips.
+- MS-03: a wick beyond without a close → no break.
 - MS-04: each swing level is broken at most once.
+- MS-05: the first break with no trend yet → labelled BOS, never CHoCH.
 
 ### 3.4 FVG (FV), Liquidity (LQ), Supply & Demand (SD), Sessions (SE)
-Cases are written into each module's rulebook at the start of its phase, following the
-same pattern: one PASS/FAIL row per rulebook rule.
+These are completed in each module's rulebook at the start of its phase: one PASS/FAIL row
+per rule. Required minimum cases:
+- FV: minimum size max(2 pts, 0.25 × ATR); filled only through the far edge; the trigger candle's own gap is confirmed one candle later.
+- LQ: EQH/EQL from swing-layer points within max(4 ticks, 0.1 × ATR); Asia/London/previous-day levels replaced daily; EQH/EQL and swing targets kept until swept or broken.
+- SD: a zone requires a body ≥ 1.5 × ATR **and** an internal structure break; invalidated by a close beyond its far edge; retired after 2 tests.
+- SE: every session boundary is correct in Chicago time in both summer and winter.
 
 ### 3.5 Confluence (CT)
-- CT-01: ORB breakout + session + bullish bias, with no second core event → **no setup**.
-- CT-02: Event 2 comes before Event 1 → **no setup**.
-- CT-03: Event 2 later than N candles after Event 1 → **no setup**.
-- CT-04: core gate passes, location missing (D9.4a) → **REJECTED** ("location").
-- CT-05: a valid T1 sequence → exactly **one** QUALIFIED setup with the correct events attached.
-- CT-06: a T2 sequence interrupted by a false breakout → **no setup**.
+| ID | Scripted scenario | Expected |
+|---|---|---|
+| CT-01 | ORB breakout + NY AM + bullish bias, with no internal BOS | **No setup** (context never creates setups) |
+| CT-02 | An internal CHoCH, then a sweep | **No setup** (wrong order) |
+| CT-03 | A sweep, then an internal CHoCH **55 min** later | **No setup** (> 50 min) |
+| CT-04 | A sweep, then an internal **BOS** (not a CHoCH) in the setup direction | **No T1** (D6.7) |
+| CT-05 | An ORB breakout, then an internal **CHoCH** in the breakout direction | **No T2** (D6.8) |
+| CT-06 | A T2 sequence with an ORB false breakout in between | **No setup** |
+| CT-07 | A valid T1 sequence with a qualifying FVG and a zone ✓ | Exactly **one** QUALIFIED setup, correct events attached |
+| CT-08 | A valid T1 sequence whose only extra ✓ is the FVG (no zone, no other level, bias not agreeing) | **REJECTED** "optional 0/1" (the FVG is used up by the location requirement) |
+| CT-09 | A valid sequence against the bias with a zone ✓ | QUALIFIED and flagged **counter-bias** |
+| CT-10 | An ORB sweep, then an internal CHoCH | One setup, labelled **T3** |
+| CT-11 | Two sweeps (Asia low, then the previous-day low), then a CHoCH | One setup, both sweeps attached, stop beyond the lower wick |
+| CT-12 | A valid sequence whose trigger candle closes at 11:05 | **No setup** (outside NY AM) |
+| CT-13 | The trigger candle's own gap is the only FVG | The plan is made on the next candle; the limit is at that gap's 50 % |
+| CT-14 | Same as CT-13, but the next candle doesn't confirm the gap | **REJECTED** "no FVG" |
 
 ### 3.6 Setup lifecycle / anti-spam (LT)
-These enforce the fixed requirements LC-1 … LC-7 in `rules/setup_lifecycle.md`.
+These enforce LC-1 … LC-7 in `rules/setup_lifecycle.md`.
 
 | ID | Scripted scenario | Expected |
 |---|---|---|
-| LT-01 | A valid setup qualifies, and its conditions stay true for 20 more candles | Exactly **1** setup |
-| LT-02 | A setup is stopped; the same sweep and shift are still within the lookback window | **No** new setup (events already used) |
-| LT-03 | A long is active; price falls through the stop | Long **STOPPED**; **no short** on that candle or during cooldown |
-| LT-04 | After LT-03, the bearish CHoCH that happened during the stop-out is the only bearish event | **No short** (D14.5a) |
-| LT-05 | After cooldown, a **new** sweep and a **new** shift confirm | One new setup is allowed |
-| LT-06 | A valid event combination confirms **during** cooldown | Ignored, and still ineligible after cooldown (D14.4a) |
-| LT-07 | A candidate is rejected (R:R too low); on the next candle R:R would pass | **No setup** (D14.7a) |
-| LT-08 | A Model B setup expires unfilled; the same events are still recent | **No** new setup |
-| LT-09 | A long is live; a valid short sequence confirms | **No short** (one live setup, D14.1a) |
-| LT-10 | The per-session cap is reached; another valid sequence confirms | **REJECTED** ("cap") |
-| LT-11 | An opposite-direction setup that fails the D14.6 requirement | **No setup** |
-| LT-12 | A same-direction setup after a stop, in the same session | Per D14.10 |
-| LT-13 | Every state change on the scripted path | Exactly one alert per state change, never repeated |
-| LT-14 | The whole scripted path run in Bar Replay | Identical to the historical result |
+| LT-01 | A valid setup qualifies; its conditions stay true for 20 more candles | Exactly **1** setup |
+| LT-02 | A setup is stopped; the same sweep and CHoCH are still within 50 min | **No** new setup (events used) |
+| LT-03 | A long is active; price falls through the stop | **STOPPED**; **no short** on that candle or during the 30-min cooldown |
+| LT-04 | After LT-03, the bearish CHoCH from the stop-out candle is the only bearish event | **No short** (event before re-arm) |
+| LT-05 | 30 min after LT-03, a **new** sweep and a **new** CHoCH confirm | One new setup (either direction) |
+| LT-06 | A valid sequence confirms **during** the cooldown | Ignored, and still ineligible after the cooldown |
+| LT-07 | A candidate is rejected (R:R 0.8); on the next candle R:R would be 1.2 | **No setup**, and **no cooldown** starts |
+| LT-08 | A Model B setup expires unfilled; the same events are still recent | **No** new setup; a 30-min cooldown runs |
+| LT-09 | A long is live (pending or active); a valid short sequence confirms | **No short** |
+| LT-10 | 2 setups have **filled** this morning; another valid sequence confirms | **REJECTED** "cap" |
+| LT-11 | 1 filled + 1 expired this morning; another valid sequence confirms | Allowed (expired doesn't count toward the cap) |
+| LT-12 | A long is stopped; 30+ min later a new long sequence from new events | Allowed |
+| LT-13 | Yesterday's last setup was a long; today's first sequence is a short | Allowed, with no cooldown carried over (daily reset) |
+| LT-14 | Every state change on the scripted path | Exactly one alert per state change, never repeated |
+| LT-15 | The whole scripted path run in Bar Replay | Identical to the historical result |
 
-### 3.7 Entry models (EM)
+### 3.7 Entry models, stops and targets (EM)
 | ID | Scripted scenario | Expected |
 |---|---|---|
-| EM-01 | Model A qualifies | Entry = trigger close; outcomes counted from the next candle |
-| EM-02 | Model A: the trigger candle's own low is below the stop | **Not** stopped (it happened before entry) |
-| EM-03 | Model B: price never reaches L within the expiry | **EXPIRED** |
-| EM-04 | Model B: price touches L exactly (D10.6b) | **Not filled** |
-| EM-05 | Model B: price trades 1 tick through L | Filled at **L** |
-| EM-06 | Model B: TP1 reached before any fill | **MISSED** (D10.8a) |
-| EM-07 | Model B: limit and stop both reachable in one candle | Filled, then **STOPPED**, *ambiguous* |
-| EM-08 | Stop and TP both reachable in one candle | **STOPPED**, *ambiguous* |
-| EM-09 | Model B: the retest level doesn't exist | **REJECTED** (D10.5a) |
-| EM-10 | Model B: L isn't between the stop and the close | **REJECTED** ("retest level invalid") |
-| EM-11 | R:R is calculated for TP1 and TP2 | Matches the hand calculation to 2 decimals |
+| EM-01 | Model B qualifies | Limit at the chosen FVG's 50 %; state PENDING |
+| EM-02 | Price reaches L exactly, but not 1 tick through | **Not filled** |
+| EM-03 | Price trades 1 tick through L | Filled at **L** |
+| EM-04 | No fill within 30 min of placement | **EXPIRED** |
+| EM-05 | TP1 (2 ticks before its level) reached before any fill | **MISSED** |
+| EM-06 | Pending; a bearish internal CHoCH (against a long) closes before the fill | **Still pending** (no structure-based cancellation) |
+| EM-07 | The fill and a close beyond the stop in one candle | Filled, then **STOPPED**, *ambiguous* |
+| EM-08 | The fill and TP1 in one candle | **Filled only**; TP1 counts from the next candle |
+| EM-09 | Stop and TP1 both reachable in one candle | **STOPPED**, *ambiguous* |
+| EM-10 | Stop distance 4.75 pts / 30.25 pts | **REJECTED** "stop too tight" / "stop too wide" |
+| EM-11 | R:R to TP1 = 0.95 | **REJECTED** "R:R" |
+| EM-12 | No untouched level beyond entry | **REJECTED** "no target" |
+| EM-13 | No level beyond TP1 | Setup kept with **TP1 only**; ends as TP1_FINAL |
+| EM-14 | TP1 hit, then price returns to entry | Stop at entry from the next candle → **BREAKEVEN** |
+| EM-15 | Setup active at the candle ending 11:00 | **CLOSED_WINDOW** at that candle's close |
+| EM-16 | Setup pending at the candle ending 11:00 | Cancelled, CLOSED_WINDOW (not filled) |
+| EM-17 | T3 after a false breakout | Stop 2 ticks beyond the extreme between the breakout and trigger candles |
+| EM-18 | T2 long | Stop 2 ticks below the most recent confirmed internal swing low at the BOS |
+| EM-19 | R:R shown for TP1 and TP2 | Matches the hand calculation to 2 decimals |
+| EM-20 | Model A (setting) qualifies | Entry = trigger close; the trigger candle's own low is never counted as a stop hit |
 
 ### 3.8 Risk (RK)
 - RK-01: account $50,000, 1 %, stop 20 pts → $500 risk; NQ risk per contract = $400 → 1 NQ; MNQ = $40 → 12 MNQ.
@@ -131,7 +160,8 @@ These enforce the fixed requirements LC-1 … LC-7 in `rules/setup_lifecycle.md`
 - Large gap opens
 - Days with no breakout, days with breakouts on both sides, days with no setup at all
 - An ORB length that doesn't divide evenly by the chart timeframe → a warning is shown
-- Every timeframe in D2.2
+- 1m and 5m charts (D2.2); other timeframes show the "untested timeframe" notice
+- US/UK daylight-saving mismatch weeks: London window stays 01:00–04:00 Chicago (D15.3)
 
 ## 6. Setup counts: a spam detector, not a target
 
