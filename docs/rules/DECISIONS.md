@@ -164,7 +164,7 @@ retest level and wait for a later candle to reach it.
 | D12.2 ❗ | **TP2** | **b) next untouched liquidity level beyond TP1** (same 2-tick offset). If none exists, or it isn't beyond TP1: **keep the setup with TP1 only** (never rejected for lack of a TP2) | DECIDED |
 | D12.3 ❗ | **Minimum R:R** to TP1 for a setup to be created | **b) 1.0** minimum R:R to TP1 (measured from the limit entry, stop buffer and target offset included); below it, the setup is rejected | DECIDED |
 | D12.4 ❗ | After TP1 is hit | **b) stop moves to entry (breakeven)** after TP1, effective from the next candle (entry_models.md §4.5) | DECIDED |
-| D12.5 ❗ | Setup still active when the trading window/session ends | a) closed at that candle's close · b) stays open until stop or target | OPEN |
+| D12.5 ❗ | Setup still active when the trading window/session ends | **a) closed at the close of the candle ending 11:00 Chicago** (outcome CLOSED_WINDOW) | DECIDED |
 | D12.6 ❗ | Target offset: **how many ticks before** the liquidity level the target sits (1 tick = 0.25 pt) | **2 ticks** (0.5 pt) before the level, for TP1 and TP2 | DECIDED |
 
 ## D13 — Setup invalidation
@@ -247,3 +247,4 @@ These questions set the remaining details.
 | 2026-09-25 | D12.2 | Decided: b) next level beyond TP1; fallback = TP1 only, no rejection | Your answer |
 | 2026-09-25 | D12.3 | Decided: minimum R:R 1.0 to TP1 | Your answer |
 | 2026-09-25 | D12.4 | Decided: b) breakeven stop after TP1 | Your answer |
+| 2026-09-25 | D12.5 | Decided: a) close open setups at the 11:00 Chicago candle close | Your answer |
