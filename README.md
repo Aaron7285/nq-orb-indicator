@@ -8,10 +8,9 @@ stop, targets and status.
 It shows **conditions that are present**. It never claims a setup is profitable or "high
 probability", and it has no scores, win rates or AI ratings.
 
-> **Status: version 0.1.0, Phase 1 (core) implemented.** The core is the shared foundation
-> (clock, price math, touch/sweep/break engine, events, drawing budget, colors, self-tests).
-> It has **no visible trading features yet**; the indicator only shows a small version line.
-> Its test indicator is [`dist/test/core_test.pine`](dist/test/core_test.pine). See
+> **Status: version 0.2.0, Phase 2 (sessions).** The core (tested 31/31) plus session tracking:
+> faint Asia and London range outlines. No setups or signals yet. Test indicators are in
+> [`dist/test/`](dist/test/). See
 > [the development plan](docs/PLAN.md) for the phases.
 
 ## Install in TradingView

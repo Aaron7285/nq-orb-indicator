@@ -3,6 +3,17 @@
 Versions follow the phases in [docs/PLAN.md](docs/PLAN.md): each completed phase raises
 the version. The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.2.0] — 2026-09-25 — Phase 2: sessions
+
+### Added
+- `modules/sessions_core`: session tracker (R1 membership, high/low/open per instance, completion and known-at time, most recent completed range per D15.4), plus drawing per DESIGN §6.6.
+- `modules/sessions`: settings for the five sessions (HHMM, Chicago), drawing switches, and the NY AM tradeable filter (D9.5, D15.2).
+- `dist/test/sessions_test.pine`: 13 scripted self-tests (SE-01 … SE-13).
+- `docs/rules/sessions.md`.
+
+### Confirmed
+- Phase 1 core: CORE 31/31 PASS in TradingView.
+
 ## [0.1.0] — 2026-09-25 — Phase 1: core
 
 ### Added

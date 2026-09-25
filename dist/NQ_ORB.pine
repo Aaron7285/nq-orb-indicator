@@ -1,14 +1,14 @@
 // ============================================================================
-// NQ.ORB · v0.1.0
+// NQ.ORB · v0.2.0
 // GENERATED FILE. Do not edit by hand: edit the files in src/ and tests/,
 // then run `python tools/build.py`.
-// Modules: core/base, core/levels, core/events, core/price, core/budget, core/theme, core/time, core/status
+// Modules: core/base, core/levels, core/events, core/price, core/budget, core/time, core/theme, modules/sessions_core, modules/sessions, core/status
 // ============================================================================
 //@version=6
 indicator("NQ.ORB", shorttitle = "NQ.ORB", overlay = true, max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
 
 // Build constants (generated)
-NQORB_VERSION = "0.1.0"
+NQORB_VERSION = "0.2.0"
 NQORB_TARGET = "main"
 
 
@@ -296,35 +296,6 @@ method addBox(DrawPool this, box obj) =>
 
 
 // ============================================================================
-// MODULE core/theme  (src/core/theme.pine)
-// Dark/light detection and the DESIGN.md color tokens (rules/core.md §8).
-// ============================================================================
-
-// Every module takes its colors from THEME; no module types its own hex color.
-type Theme
-    color bull
-    color bear
-    color accent
-    color ink
-    color ink2
-    color faint
-
-th_isDarkBg(color bg) =>
-    0.299 * color.r(bg) + 0.587 * color.g(bg) + 0.114 * color.b(bg) < 128
-
-// DESIGN.md §2.1. Validated values: re-run the palette validator before changing them.
-th_make(bool dark) =>
-    Theme t = na
-    if dark
-        t := Theme.new(#1BA995, #B45C5E, #B08E21, #D1D4DC, #9598A1, #5D606B)
-    else
-        t := Theme.new(#1B9786, #A05052, #B48630, #131722, #5D606B, #9598A1)
-    t
-
-var Theme THEME = th_make(th_isDarkBg(chart.bg_color))
-
-
-// ============================================================================
 // MODULE core/time  (src/core/time.pine)
 // Trading day, session windows, minute-based durations and timeframe support (rules/core.md §2).
 // ============================================================================
@@ -361,6 +332,192 @@ tm_durationDone(int startMs, int minutes, int candleClose) =>
 // D2.2: 1m and 5m charts are supported; other timeframes run with a notice.
 tm_supportedTf(string tf) =>
     tf == "1" or tf == "5"
+
+
+// ============================================================================
+// MODULE core/theme  (src/core/theme.pine)
+// Dark/light detection and the DESIGN.md color tokens (rules/core.md §8).
+// ============================================================================
+
+// Every module takes its colors from THEME; no module types its own hex color.
+type Theme
+    color bull
+    color bear
+    color accent
+    color ink
+    color ink2
+    color faint
+
+th_isDarkBg(color bg) =>
+    0.299 * color.r(bg) + 0.587 * color.g(bg) + 0.114 * color.b(bg) < 128
+
+// DESIGN.md §2.1. Validated values: re-run the palette validator before changing them.
+th_make(bool dark) =>
+    Theme t = na
+    if dark
+        t := Theme.new(#1BA995, #B45C5E, #B08E21, #D1D4DC, #9598A1, #5D606B)
+    else
+        t := Theme.new(#1B9786, #A05052, #B48630, #131722, #5D606B, #9598A1)
+    t
+
+var Theme THEME = th_make(th_isDarkBg(chart.bg_color))
+
+
+// ============================================================================
+// MODULE modules/sessions_core  (src/modules/sessions_core.pine)
+// Session tracker: membership, high/low/open per session instance, most recent completed range, drawing (rules/sessions.md).
+// ============================================================================
+
+// update() results
+SES_NONE = 0
+SES_STARTED = 1
+SES_UPDATED = 2
+SES_COMPLETED = 3
+
+// One session definition plus its running state. Times are Chicago minutes of the day.
+// hi/lo/op: the current (or just finished) instance. last*: the most recent COMPLETED
+// instance (D15.4: only the most recent one is kept; it is replaced each day).
+type SessionTracker
+    string key
+    string tag
+    int startMin
+    int endMin
+    bool active = false
+    int day
+    float hi
+    float lo
+    float op
+    int startT
+    int lastClose
+    bool partial = false
+    float lastHi
+    float lastLo
+    float lastOp
+    int lastKnownAt
+    int lastDay
+    bool lastPartial = false
+    line hiLn
+    line loLn
+    label tagLb
+    box shadeBx
+
+ses_new(string key, string tag, int startMin, int endMin) =>
+    SessionTracker.new(key = key, tag = tag, startMin = startMin, endMin = endMin)
+
+// Session inputs are typed as HHMM, e.g. 1900 -> 19:00 -> 1140 minutes.
+ses_hhmmToMin(int hhmm) =>
+    int(math.floor(hhmm / 100.0)) * 60 + hhmm % 100
+
+// R1 membership of one candle.
+method contains(SessionTracker this, Candle c) =>
+    tm_inWindow(c, this.startMin, this.endMin)
+
+method complete(SessionTracker this) =>
+    this.active := false
+    this.lastHi := this.hi
+    this.lastLo := this.lo
+    this.lastOp := this.op
+    this.lastKnownAt := this.lastClose
+    this.lastDay := this.day
+    this.lastPartial := this.partial
+
+// Feed one CLOSED candle. An instance starts at the first candle inside the window and
+// completes on the candle that closes at the window end, or, if that candle is missing
+// (holiday, early close, data gap), on the first candle after it. The completed range
+// becomes known at the close of its last candle inside the window (core C5 uses this).
+method update(SessionTracker this, Candle c) =>
+    int status = SES_NONE
+    bool inWin = this.contains(c)
+    int d = tm_tradingDay(c.t)
+    if this.active and (not inWin or d != this.day)
+        this.complete()
+        status := SES_COMPLETED
+    if inWin
+        if not this.active
+            this.active := true
+            this.day := d
+            this.hi := c.h
+            this.lo := c.l
+            this.op := c.o
+            this.startT := c.t
+            this.partial := tm_minuteOfDay(c.t) != this.startMin
+            status := SES_STARTED
+        else
+            this.hi := math.max(this.hi, c.h)
+            this.lo := math.min(this.lo, c.l)
+            status := SES_UPDATED
+        this.lastClose := c.tc
+        if tm_minuteOfDay(c.tc) == this.endMin % 1440
+            this.complete()
+            status := SES_COMPLETED
+    status
+
+// DESIGN.md §6.6: faint dotted outline of the session's high/low (tier 3), a tiny tag
+// at its start, optional 96 % shade. Called after update() on closed chart candles.
+method draw(SessionTracker this, int status, DrawPool pool, bool shade) =>
+    color lineCol = color.new(THEME.ink2, 60)
+    if status == SES_STARTED
+        this.hiLn := pool.addLine(line.new(this.startT, this.hi, this.lastClose, this.hi, xloc = xloc.bar_time, color = lineCol, style = line.style_dotted, width = 1))
+        this.loLn := pool.addLine(line.new(this.startT, this.lo, this.lastClose, this.lo, xloc = xloc.bar_time, color = lineCol, style = line.style_dotted, width = 1))
+        this.tagLb := pool.addLabel(label.new(this.startT, this.hi, this.tag, xloc = xloc.bar_time, style = label.style_label_lower_left, color = color.new(THEME.ink2, 100), textcolor = THEME.ink2, size = size.tiny))
+        if shade
+            this.shadeBx := pool.addBox(box.new(this.startT, this.hi, this.lastClose, this.lo, xloc = xloc.bar_time, bgcolor = color.new(THEME.ink2, 96), border_color = color.new(THEME.ink2, 100)))
+    else if (status == SES_UPDATED or status == SES_COMPLETED) and not na(this.hiLn)
+        line.set_xy2(this.hiLn, this.lastClose, this.hi)
+        line.set_y1(this.hiLn, this.hi)
+        line.set_xy2(this.loLn, this.lastClose, this.lo)
+        line.set_y1(this.loLn, this.lo)
+        label.set_y(this.tagLb, this.hi)
+        if not na(this.shadeBx)
+            box.set_top(this.shadeBx, this.hi)
+            box.set_bottom(this.shadeBx, this.lo)
+            box.set_right(this.shadeBx, this.lastClose)
+    status
+
+
+// ============================================================================
+// MODULE modules/sessions  (src/modules/sessions.pine)
+// Session settings, the five session trackers and the tradeable-session filter (D15.1–D15.4, D9.5).
+// ============================================================================
+
+SES_GRP = "Sessions · Chicago time (HHMM)"
+sesShowAsia = input.bool(true, "Asia", inline = "as", group = SES_GRP)
+sesAsiaStart = input.int(1900, "", minval = 0, maxval = 2359, inline = "as", group = SES_GRP)
+sesAsiaEnd = input.int(2300, "–", minval = 0, maxval = 2359, inline = "as", group = SES_GRP)
+sesShowLondon = input.bool(true, "London", inline = "lo", group = SES_GRP)
+sesLondonStart = input.int(100, "", minval = 0, maxval = 2359, inline = "lo", group = SES_GRP)
+sesLondonEnd = input.int(400, "–", minval = 0, maxval = 2359, inline = "lo", group = SES_GRP)
+sesShowNy = input.bool(false, "New York", inline = "ny", group = SES_GRP)
+sesNyStart = input.int(830, "", minval = 0, maxval = 2359, inline = "ny", group = SES_GRP)
+sesNyEnd = input.int(1500, "–", minval = 0, maxval = 2359, inline = "ny", group = SES_GRP)
+sesShowNyAm = input.bool(false, "NY AM", inline = "am", group = SES_GRP, tooltip = "NY AM is the only session where setups may form (D15.2). The on/off switches only change what is drawn.")
+sesNyAmStart = input.int(830, "", minval = 0, maxval = 2359, inline = "am", group = SES_GRP)
+sesNyAmEnd = input.int(1100, "–", minval = 0, maxval = 2359, inline = "am", group = SES_GRP)
+sesShowNyPm = input.bool(false, "NY PM", inline = "pm", group = SES_GRP)
+sesNyPmStart = input.int(1230, "", minval = 0, maxval = 2359, inline = "pm", group = SES_GRP)
+sesNyPmEnd = input.int(1500, "–", minval = 0, maxval = 2359, inline = "pm", group = SES_GRP)
+sesShade = input.bool(false, "Shade session ranges", group = SES_GRP)
+
+var SessionTracker SES_ASIA = ses_new("ASIA", "Asia", ses_hhmmToMin(sesAsiaStart), ses_hhmmToMin(sesAsiaEnd))
+var SessionTracker SES_LONDON = ses_new("LONDON", "London", ses_hhmmToMin(sesLondonStart), ses_hhmmToMin(sesLondonEnd))
+var SessionTracker SES_NY = ses_new("NY", "New York", ses_hhmmToMin(sesNyStart), ses_hhmmToMin(sesNyEnd))
+var SessionTracker SES_NYAM = ses_new("NYAM", "NY AM", ses_hhmmToMin(sesNyAmStart), ses_hhmmToMin(sesNyAmEnd))
+var SessionTracker SES_NYPM = ses_new("NYPM", "NY PM", ses_hhmmToMin(sesNyPmStart), ses_hhmmToMin(sesNyPmEnd))
+var array<SessionTracker> SES_ALL = array.from(SES_ASIA, SES_LONDON, SES_NY, SES_NYAM, SES_NYPM)
+var array<bool> SES_SHOW = array.from(sesShowAsia, sesShowLondon, sesShowNy, sesShowNyAm, sesShowNyPm)
+var DrawPool SES_POOL = db_newPool("sessions")
+
+// D9.5 / D15.2: setups may only form on candles inside NY AM (hard filter).
+ses_isTradeable(Candle c) =>
+    SES_NYAM.contains(c)
+
+// Anti-repaint: sessions only ever see closed candles.
+if barstate.isconfirmed
+    Candle sesCandle = core_chartCandle()
+    for [i, s] in SES_ALL
+        int st = s.update(sesCandle)
+        if SES_SHOW.get(i)
+            s.draw(st, SES_POOL, sesShade)
 
 
 // ============================================================================

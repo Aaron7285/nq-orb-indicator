@@ -119,6 +119,24 @@ per rule. Required minimum cases:
 - SD: a zone requires a body ≥ 1.5 × ATR **and** an internal structure break; invalidated by a close beyond its far edge; retired after 2 tests.
 - SE: every session boundary is correct in Chicago time in both summer and winter.
 
+**Sessions (SE)**, in `dist/test/sessions_test.pine` (rulebook `rules/sessions.md`)
+
+| ID | Scripted case | Expected |
+|---|---|---|
+| SE-01 | Asia 5m candles 19:00–23:00 (high 105 at 20:00, low 96 at 21:30) | 105 / 96 / open 99.5 / known at 23:00 |
+| SE-02 | Extreme candles at 18:55 and 23:00 | Excluded (R1) |
+| SE-03 | The candle closing at 23:00 | Completes the session |
+| SE-04 | Trading day of the Mon 19:00 Asia session | Tuesday's date (C1) |
+| SE-05 | The same Asia session on 1m | Same range, known at 23:00 |
+| SE-06 | The next day's Asia (high 110) | Replaces the most recent (D15.4) |
+| SE-07 | London 1m 01:00–04:00 | 104 / 97 / known at 04:00 |
+| SE-08 | London candles stop at 03:35; the next candle is at 05:00 | Completes on the 05:00 candle, known at 03:35 |
+| SE-09 | First seen at 20:30 / from 19:00 | Partial yes / no (S2) |
+| SE-10 | NY AM 08:25/08:30/10:55/11:00 | no, yes, yes, no (tradeable filter) |
+| SE-11 | 09:00 and 12:30 candles | In NY and NY AM; in NY and NY PM |
+| SE-12 | 19:00 Chicago in January | In Asia; 01:00 UTC (winter) |
+| SE-13 | HHMM settings 1900 / 130 / 2300 | 1140 / 90 / 1380 minutes |
+
 ### 3.5 Confluence (CT)
 | ID | Scripted scenario | Expected |
 |---|---|---|
@@ -225,4 +243,6 @@ more or fewer setups. A day with zero setups is a valid result.
 | 2026-09-25 | Phase 0 / tooling | L0 | PASS | 32 tool self-tests, lint (0 problems), build check: all pass locally |
 | 2026-09-25 | Phase 0 / pipeline check | L1 | PASS | Compiled and added to an NQ1! 5m chart in TradingView with no errors (reported by you) |
 | 2026-09-25 | Phase 1 / core | L0 | PASS | Build, lint (10 files, 0 problems) and 32 tool tests pass |
-| — | Phase 1 / core | L1 + L2 | *waiting for you* | Add `dist/test/core_test.pine` (expect **CORE 31/31 PASS**) and `dist/NQ_ORB.pine` (expect only the grey version line) |
+| 2026-09-25 | Phase 1 / core | L1 + L2 | PASS | CORE 31/31 PASS in TradingView; PX-04: diff 0 over 5554 candles, 0 start mismatches (screenshot from you) |
+| 2026-09-25 | Phase 2 / sessions | L0 | PASS | Build, lint (13 files, 0 problems), 32 tool tests |
+| — | Phase 2 / sessions | L1 + L2 + L6 | *waiting for you* | `dist/test/sessions_test.pine` (expect **SESSIONS 13/13 PASS**); updated `dist/NQ_ORB.pine` shows Asia/London outlines |

@@ -1,0 +1,42 @@
+// @module modules/sessions
+// @requires modules/sessions_core, core/base, core/budget
+// @description Session settings, the five session trackers and the tradeable-session filter (D15.1–D15.4, D9.5).
+
+SES_GRP = "Sessions · Chicago time (HHMM)"
+sesShowAsia = input.bool(true, "Asia", inline = "as", group = SES_GRP)
+sesAsiaStart = input.int(1900, "", minval = 0, maxval = 2359, inline = "as", group = SES_GRP)
+sesAsiaEnd = input.int(2300, "–", minval = 0, maxval = 2359, inline = "as", group = SES_GRP)
+sesShowLondon = input.bool(true, "London", inline = "lo", group = SES_GRP)
+sesLondonStart = input.int(100, "", minval = 0, maxval = 2359, inline = "lo", group = SES_GRP)
+sesLondonEnd = input.int(400, "–", minval = 0, maxval = 2359, inline = "lo", group = SES_GRP)
+sesShowNy = input.bool(false, "New York", inline = "ny", group = SES_GRP)
+sesNyStart = input.int(830, "", minval = 0, maxval = 2359, inline = "ny", group = SES_GRP)
+sesNyEnd = input.int(1500, "–", minval = 0, maxval = 2359, inline = "ny", group = SES_GRP)
+sesShowNyAm = input.bool(false, "NY AM", inline = "am", group = SES_GRP, tooltip = "NY AM is the only session where setups may form (D15.2). The on/off switches only change what is drawn.")
+sesNyAmStart = input.int(830, "", minval = 0, maxval = 2359, inline = "am", group = SES_GRP)
+sesNyAmEnd = input.int(1100, "–", minval = 0, maxval = 2359, inline = "am", group = SES_GRP)
+sesShowNyPm = input.bool(false, "NY PM", inline = "pm", group = SES_GRP)
+sesNyPmStart = input.int(1230, "", minval = 0, maxval = 2359, inline = "pm", group = SES_GRP)
+sesNyPmEnd = input.int(1500, "–", minval = 0, maxval = 2359, inline = "pm", group = SES_GRP)
+sesShade = input.bool(false, "Shade session ranges", group = SES_GRP)
+
+var SessionTracker SES_ASIA = ses_new("ASIA", "Asia", ses_hhmmToMin(sesAsiaStart), ses_hhmmToMin(sesAsiaEnd))
+var SessionTracker SES_LONDON = ses_new("LONDON", "London", ses_hhmmToMin(sesLondonStart), ses_hhmmToMin(sesLondonEnd))
+var SessionTracker SES_NY = ses_new("NY", "New York", ses_hhmmToMin(sesNyStart), ses_hhmmToMin(sesNyEnd))
+var SessionTracker SES_NYAM = ses_new("NYAM", "NY AM", ses_hhmmToMin(sesNyAmStart), ses_hhmmToMin(sesNyAmEnd))
+var SessionTracker SES_NYPM = ses_new("NYPM", "NY PM", ses_hhmmToMin(sesNyPmStart), ses_hhmmToMin(sesNyPmEnd))
+var array<SessionTracker> SES_ALL = array.from(SES_ASIA, SES_LONDON, SES_NY, SES_NYAM, SES_NYPM)
+var array<bool> SES_SHOW = array.from(sesShowAsia, sesShowLondon, sesShowNy, sesShowNyAm, sesShowNyPm)
+var DrawPool SES_POOL = db_newPool("sessions")
+
+// D9.5 / D15.2: setups may only form on candles inside NY AM (hard filter).
+ses_isTradeable(Candle c) =>
+    SES_NYAM.contains(c)
+
+// Anti-repaint: sessions only ever see closed candles.
+if barstate.isconfirmed
+    Candle sesCandle = core_chartCandle()
+    for [i, s] in SES_ALL
+        int st = s.update(sesCandle)
+        if SES_SHOW.get(i)
+            s.draw(st, SES_POOL, sesShade)

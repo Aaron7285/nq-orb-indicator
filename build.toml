@@ -20,14 +20,19 @@ max_lines_count = 500
 max_labels_count = 500
 max_boxes_count = 500
 
-# The full product. Phase 1: the core (no visible trading features yet).
+# The full product. Phase 2: core + sessions.
 [targets.main]
 output = "dist/NQ_ORB.pine"
 title = "NQ.ORB"
-modules = ["core/levels", "core/events", "core/price", "core/budget", "core/status"]
+modules = ["core/levels", "core/events", "core/price", "core/budget", "modules/sessions", "core/status"]
 
 # Standalone test indicators (one per module, TESTING.md §3).
 [targets.test_core]
 output = "dist/test/core_test.pine"
 title = "NQ.ORB test: core"
 modules = ["tests/core_selftest"]
+
+[targets.test_sessions]
+output = "dist/test/sessions_test.pine"
+title = "NQ.ORB test: sessions"
+modules = ["tests/sessions_selftest"]
