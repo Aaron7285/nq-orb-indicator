@@ -58,18 +58,18 @@ Status key: `OPEN` · `DECIDED` · `CHANGED` (decided, then revised; see change 
 
 | ID | Question | Options | Status |
 |---|---|---|---|
-| D5.1 | Which levels are **liquidity pools that can anchor a setup** (choose any) | PDH/PDL · previous-session H/L (which sessions?) · EQH/EQL · ORB H/L · swing-layer highs/lows · internal highs/lows. ★ PDH/PDL, Asia H/L, London H/L, EQH/EQL, ORB H/L. Raw swing points are excluded to keep setups meaningful. | OPEN |
+| D5.1 | Which levels are **liquidity pools that can anchor a setup** (choose any) | **PDH/PDL, Asia H/L, London H/L, EQH/EQL, ORB H/L** can be swept to trigger setups. Raw swing points are excluded. | DECIDED |
 | D5.2 ❗ | "Previous day" means | **a) full futures day**, 18:00–17:00 New York (= 17:00–16:00 Chicago) | DECIDED |
-| D5.3 | **Minimum penetration** beyond a level for a sweep | a) 1 tick · b) ★ 2 ticks · c) fraction of ATR | OPEN |
-| D5.4 | **Close-back** requirement | a) ★ the **same candle** must close back on the original side · b) within N candles (then it's also a "failed break") | OPEN |
-| D5.5 | **Rejection-strength** filter | a) none (close-back only) · b) the wick beyond the level ≥ X % of the candle range · c) ★ the candle closes in the half of its range away from the level | OPEN |
-| D5.6 | **Maximum penetration** (beyond this, it's a run rather than a sweep) | a) ★ no maximum · b) X points or k × ATR | OPEN |
-| D5.7 | **Touch** tolerance: price gets this close without a sweep, and it's recorded as a touch | ★ 2 ticks | OPEN |
-| D5.8 | **EQH/EQL** tolerance: how close two swing highs/lows must be to count as "equal" | a) X ticks · b) k × ATR · c) ★ whichever is larger (e.g. 4 ticks or 0.1 × ATR(14)) | OPEN |
-| D5.9 | Can a pool be swept more than once? | a) ★ no: a pool is used up by its first sweep · b) yes | OPEN |
-| D5.10 | Which levels can be **targets** (TP1/TP2, D12.1/D12.2) | a) the same list as D5.1 · b) the D5.1 list **plus** untouched swing-layer highs/lows, used as targets only (they can't trigger sweeps) | OPEN |
-| D5.11 | **EQH/EQL** are built from which swing points | a) internal (many EQH/EQL, so more sweep triggers and targets) · b) swing (few, more significant) | OPEN |
-| D5.12 | How long an untouched EQH/EQL (and a swing target, if D5.10 b) stays active | a) current futures day only · b) until swept or broken, whatever its age | OPEN |
+| D5.3 | **Minimum penetration** beyond a level for a sweep | **2 ticks** minimum penetration | DECIDED |
+| D5.4 | **Close-back** requirement | **a) same candle must close back** (on 5m and 1m alike) | DECIDED |
+| D5.5 | **Rejection-strength** filter | **c) sweep candle closes in the half of its range away from the level** | DECIDED |
+| D5.6 | **Maximum penetration** (beyond this, it's a run rather than a sweep) | **a) no maximum penetration** | DECIDED |
+| D5.7 | **Touch** tolerance: price gets this close without a sweep, and it's recorded as a touch | **2 ticks** touch tolerance | DECIDED |
+| D5.8 | **EQH/EQL** tolerance: how close two swing highs/lows must be to count as "equal" | **c) larger of 4 ticks (1 pt) and 0.1 × ATR(14)** | DECIDED |
+| D5.9 | Can a pool be swept more than once? | **a) a level is used up by its first sweep** (and by a break) | DECIDED |
+| D5.10 | Which levels can be **targets** (TP1/TP2, D12.1/D12.2) | **b) the D5.1 list plus untouched swing-layer highs/lows**, the latter as **targets only** | DECIDED |
+| D5.11 | **EQH/EQL** are built from which swing points | **b) swing-layer points** | DECIDED |
+| D5.12 | How long an untouched EQH/EQL (and a swing target, if D5.10 b) stays active | **b) active until swept or broken, whatever its age** (limited in practice by loaded chart history) | DECIDED |
 
 ★ D5.4a/D5.5c: stricter definitions give fewer, clearer sweeps. The level-interaction
 engine still records touches and breaks for display.
@@ -268,3 +268,14 @@ These questions set the remaining details.
 | 2026-09-25 | D4.2 | Decided: 15 minutes (3 candles on 5m) | ★ accepted (Group 1) |
 | 2026-09-25 | D4.3 | Decided: a) recorded as an "ORB sweep" (liquidity event, separate from a false breakout) | ★ accepted (Group 1) |
 | 2026-09-25 | D5.10–D5.12 | Added: target level list, EQH/EQL source layer, EQH/EQL lifetime | Gaps found while reviewing Group 2 |
+| 2026-09-25 | D5.1 | Decided: PDH/PDL, Asia H/L, London H/L, EQH/EQL, ORB H/L can be swept to trigger setups. Raw swing points are excluded. | Group 2 answer |
+| 2026-09-25 | D5.3 | Decided: 2 ticks minimum penetration | Group 2 answer |
+| 2026-09-25 | D5.4 | Decided: a) same candle must close back (on 5m and 1m alike) | Group 2 answer |
+| 2026-09-25 | D5.5 | Decided: c) sweep candle closes in the half of its range away from the level | Group 2 answer |
+| 2026-09-25 | D5.6 | Decided: a) no maximum penetration | Group 2 answer |
+| 2026-09-25 | D5.7 | Decided: 2 ticks touch tolerance | Group 2 answer |
+| 2026-09-25 | D5.8 | Decided: c) larger of 4 ticks (1 pt) and 0.1 × ATR(14) | Group 2 answer |
+| 2026-09-25 | D5.9 | Decided: a) a level is used up by its first sweep (and by a break) | Group 2 answer |
+| 2026-09-25 | D5.10 | Decided: b) the D5.1 list plus untouched swing-layer highs/lows, the latter as targets only | Group 2 answer |
+| 2026-09-25 | D5.11 | Decided: b) swing-layer points | Group 2 answer |
+| 2026-09-25 | D5.12 | Decided: b) active until swept or broken, whatever its age (limited in practice by loaded chart history) | Group 2 answer |
