@@ -1,7 +1,7 @@
 # NQ.ORB — Trading Rules at a Glance
 
-**Status:** complete, awaiting your approval. Every line traces to `DECISIONS.md` (IDs in
-brackets). §9 lists the definitions Claude had to make precise; they need your approval too.
+**Status:** approved 2026-09-25, including R1–R13. Every line traces to `DECISIONS.md`
+(IDs in brackets). Changes need your approval and are logged in `DECISIONS.md`.
 All times are **Chicago**. 1 tick = 0.25 pt. NQ = $20/pt, MNQ = $2/pt.
 
 ## 1. Chart and time
@@ -113,7 +113,7 @@ never creates a setup. [D9.3–D9.13, D11.4, D11.5, D12.3, D14.8]
   [D14.6, D14.8–D14.11, D14.13]
 - "Stop-out" = a full stop at a loss only. [D14.12]
 
-## 9. Derived definitions (please approve)
+## 9. Derived definitions (approved)
 These make your decisions precise enough to code and test. They don't add new trading ideas.
 
 | # | Definition |

@@ -2,9 +2,8 @@
 
 An NQ/MNQ intraday trading indicator for TradingView, built around an 08:00 Chicago opening range.
 
-**Status:** Rules lock. All 104 trading decisions are recorded in `docs/rules/DECISIONS.md`;
-the complete rule set is summarized in `docs/rules/SUMMARY.md` and is **awaiting your final
-approval**. No Pine Script is written before that approval.
+**Status:** Rules approved (2026-09-25; `docs/rules/SUMMARY.md`). **Phase 0 (project setup)
+complete, v0.0.0.** Next: Phase 1 (core).
 **Architecture:** approved (modules + build tool), 2026-09-25.
 
 ---
@@ -206,10 +205,11 @@ It's built only from decided answers:
 9. `lint.py` rejects: `varip`, `lookahead_on` outside one approved helper, negative plot
    offsets, `timenow` in logic, and logic that branches on `barstate.isrealtime`.
 
-## 9. Visual design (full system in `DESIGN.md`, Phase 0)
+## 9. Visual design (full system in `DESIGN.md`)
 
-- **Six colors:** muted teal (bullish), muted coral (bearish), muted amber (the single
-  accent, for the ORB and the active setup) and three grays.
+- **Six colors:** teal (bullish), muted red (bearish), muted gold (the single accent, for
+  the ORB and the active setup) and three grays. They're validated for contrast and
+  color-blind separation on dark and light charts (`DESIGN.md` §2).
 - **Tiers:**
   - Tier 1, act on it: the active setup's lines and the dashboard.
   - Tier 2, key levels: the ORB, PDH/PDL and top-ranked zones.
@@ -234,8 +234,8 @@ It's built only from decided answers:
 
 | Phase | Deliverable | Depends on | Gate |
 |---|---|---|---|
-| **R** | **Rules lock:** answer `DECISIONS.md` ✓, approve `SUMMARY.md` and the rulebooks (current step) | — | All decided ✓ · your approval |
-| 0 | Tooling: build.py, lint.py, GitHub check, DESIGN.md, README | R | Build + lint pass |
+| **R** | Rules lock: `DECISIONS.md`, `SUMMARY.md` and the rulebooks ✓ **done** | — | Approved 2026-09-25 |
+| 0 | Tooling: build.py, lint.py, GitHub check, DESIGN.md, README ✓ **done (v0.0.0)** | R | Build + lint pass ✓ |
 | 1 | Core: types, event IDs, time/tick/ATR helpers, level-interaction engine, drawing budget, self-test framework | 0 | Core self-tests pass |
 | 2 | Sessions | 1 | Module workflow (§10) |
 | 3 | Opening range (breakout, false breakout, ORB sweep) | 2 | §10 |

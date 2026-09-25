@@ -173,4 +173,5 @@ more or fewer setups. A day with zero setups is a valid result.
 
 | Date | Phase / module | Level | Result | Notes / screenshot |
 |---|---|---|---|---|
-| — | — | — | — | No tests run yet (rules lock) |
+| 2026-09-25 | Phase 0 / tooling | L0 | PASS | 32 tool self-tests, lint (0 problems), build check: all pass locally |
+| — | Phase 0 / pipeline check | L1 | *waiting for you* | Add `dist/NQ_ORB.pine` to a chart; expect a small grey status line bottom-right and no errors |

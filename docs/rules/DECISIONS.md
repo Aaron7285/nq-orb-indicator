@@ -1,6 +1,7 @@
 # Trading Rules — Decision Register
 
-**Status:** all decisions made (2026-09-25). The complete rule set is summarized in `SUMMARY.md`.
+**Status:** all decisions made and **approved on 2026-09-25**, including the derived
+definitions R1–R13. The complete rule set is summarized in `SUMMARY.md`.
 
 **Purpose:** every trading rule that could reasonably be defined in more than one way
 is listed here as a question. Nothing in this project is coded until the decisions it
@@ -343,3 +344,4 @@ These questions set the remaining details.
 | 2026-09-25 | D15.1 | Decided: Chicago time: Asia 19:00–23:00 · London 01:00–04:00 · New York 08:30–15:00 · NY AM 08:30–11:00 · NY PM 12:30–15:00 | Group 7 answer |
 | 2026-09-25 | D15.3 | Decided: a) all sessions in Chicago time (fixed clock times all year) | Group 7 answer |
 | 2026-09-25 | D15.4 | Decided: a) only the most recent ones, replaced each day | Group 7 answer |
+| 2026-09-25 | All | Rule set approved, including derived definitions R1–R13 (SUMMARY.md §9) | Your approval |

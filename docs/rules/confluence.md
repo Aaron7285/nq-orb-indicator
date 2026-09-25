@@ -1,8 +1,7 @@
 # Rulebook — Confluence Engine
 
-**Status:** every input is decided (see `DECISIONS.md`). **Awaiting your final approval.**
-Items marked *(derived)* are precise definitions needed to apply your decisions; they're
-listed in `SUMMARY.md` §9 for approval.
+**Status:** approved 2026-09-25. Items marked *(derived)* are the precise definitions
+approved as R1–R13 in `SUMMARY.md` §9.
 **Built in:** Phase 8. **Depends on:** all detector modules.
 All times are **Chicago time** (D1.2, D15.3).
 

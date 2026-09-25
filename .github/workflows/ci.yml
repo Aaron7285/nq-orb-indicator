@@ -1,0 +1,29 @@
+# Automatic checks (test level L0 in docs/TESTING.md).
+# Runs on every push and pull request; a green check mark means all three passed.
+name: checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Tool self-tests
+        run: python -m unittest discover -s tools/tests -v
+
+      - name: Repaint and safety lint
+        run: python tools/lint.py
+
+      - name: dist/ is up to date with src/
+        run: python tools/build.py --check

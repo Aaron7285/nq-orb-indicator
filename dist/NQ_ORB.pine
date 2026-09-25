@@ -1,0 +1,28 @@
+// ============================================================================
+// NQ.ORB · v0.0.0
+// GENERATED FILE. Do not edit by hand: edit the files in src/ and tests/,
+// then run `python tools/build.py`.
+// Modules: core/pipeline_check
+// ============================================================================
+//@version=6
+indicator("NQ.ORB", shorttitle = "NQ.ORB", overlay = true, max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
+
+// Build constants (generated)
+NQORB_VERSION = "0.0.0"
+NQORB_TARGET = "main"
+
+
+// ============================================================================
+// MODULE core/pipeline_check  (src/core/pipeline_check.pine)
+// Phase 0 placeholder: proves the build-to-TradingView pipeline works. No trading logic; replaced in Phase 1.
+// ============================================================================
+
+// A small, quiet status line in the bottom-right corner. Its ink is derived from
+// the chart's own text color, so it stays readable on dark and light charts
+// (docs/DESIGN.md §2.3).
+var table pipelineStatus = table.new(position.bottom_right, 1, 1)
+if barstate.islast
+    table.cell(pipelineStatus, 0, 0, "NQ.ORB " + NQORB_VERSION + " · pipeline check · no trading logic yet", text_color = color.new(chart.fg_color, 35), text_size = size.small)
+
+// Every indicator needs at least one output call; this hidden plot provides it.
+plot(float(na), "Pipeline check", display = display.none)

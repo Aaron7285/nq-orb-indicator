@@ -1,0 +1,33 @@
+# Build configuration for NQ.ORB. See docs/PLAN.md §3.2 and tools/build.py.
+#
+# Each [targets.*] entry becomes one self-contained TradingView script in dist/.
+# List only the modules a target needs; their @requires dependencies are added
+# automatically, in dependency order.
+
+[project]
+name = "NQ.ORB"
+version_file = "VERSION"
+# Folder -> prefix for module ids. src/core/x.pine is "core/x";
+# tests/x.pine is "tests/x".
+module_roots = { src = "", tests = "tests/" }
+
+# Settings passed to indicator() in every target. TradingView allows at most
+# 500 of each drawing type per script; modules share them through the drawing
+# budget (docs/PLAN.md §3.3).
+[indicator]
+overlay = true
+max_lines_count = 500
+max_labels_count = 500
+max_boxes_count = 500
+
+# The full product. Phase 0: only the pipeline check (no trading logic).
+[targets.main]
+output = "dist/NQ_ORB.pine"
+title = "NQ.ORB"
+modules = ["core/pipeline_check"]
+
+# Standalone test indicators are added here from Phase 1 onward, e.g.:
+# [targets.test_core]
+# output = "dist/test/core_test.pine"
+# title = "NQ.ORB test: core"
+# modules = ["tests/core_selftest"]

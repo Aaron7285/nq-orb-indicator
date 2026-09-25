@@ -1,7 +1,6 @@
 # Rulebook — Entry Models, Stops, Targets & Outcomes
 
-**Status:** every input is decided (see `DECISIONS.md`). **Awaiting your final approval.**
-Items marked *(derived)* are listed in `SUMMARY.md` §9 for approval.
+**Status:** approved 2026-09-25. Items marked *(derived)* were approved as R1–R13 in `SUMMARY.md` §9.
 **Built in:** Phase 10. **Depends on:** Setup lifecycle, Liquidity, Structure, FVG, Supply & Demand.
 All times are **Chicago time**. 1 tick = 0.25 points.
 
