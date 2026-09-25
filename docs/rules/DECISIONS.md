@@ -138,7 +138,7 @@ retest level and wait for a later candle to reach it.
 | D10.1 | How the models are offered | a) ★ one model chosen per chart in settings (one clear plan per setup) · b) both plans shown for every setup | OPEN |
 | D10.2 ❗ | **Default** model | **B: Limit Retest** | DECIDED |
 | D10.3 | Model A: extra requirement on the trigger candle | a) ★ none (the trigger event already requires a close) · b) close in the outer X % of its range · c) body ≥ k × ATR | OPEN |
-| D10.4 ❗ | Model B: **retest level** | a) FVG near edge · b) FVG 50 % · c) zone near edge · d) the broken structure level · e) 50 % of the displacement leg | OPEN |
+| D10.4 ❗ | Model B: **retest level** | **b) FVG 50 %**. If several qualifying FVGs exist (which ones qualify: D8.4), use the **most recent one, closest to current price**. | DECIDED |
 | D10.5 | Model B: the chosen level doesn't exist for this setup (e.g. no FVG formed) | a) ★ the setup is rejected (no substitute) · b) fall back to another level (say which) | OPEN |
 | D10.6 | Model B: **fill** rule | a) price touches the limit · b) ★ price trades through the limit by ≥ 1 tick (more conservative) | OPEN |
 | D10.7 ❗ | Model B: **expiry**, in candles without a fill | a number | OPEN |
@@ -233,3 +233,4 @@ These questions set the remaining details.
 | 2026-09-25 | D9.11 | Added and decided: key level counts only if different from the core events' level | Your answer |
 | 2026-09-25 | D9.12 | Added and decided: ORB position shown, not counted toward M | Your answer |
 | 2026-09-25 | D10.2 | Decided: default entry model B (Limit Retest) | Your answer |
+| 2026-09-25 | D10.4 | Decided: b) FVG 50 %; with several FVGs, use the most recent one closest to price | Your answer |
