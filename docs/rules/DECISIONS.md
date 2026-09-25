@@ -114,7 +114,7 @@ setup, alone or together.
 
 | ID | Question | Options | Status |
 |---|---|---|---|
-| D9.1 ❗ | Which **setup types** are enabled (choose any) | **T1 Sweep → Shift** (reversal after a liquidity sweep) · **T2 ORB Breakout → BOS** (continuation) · **T3 ORB Failure → Shift** (reversal after a false breakout) | OPEN |
+| D9.1 ❗ | Which **setup types** are enabled (choose any) | **All three: T1, T2 and T3** | DECIDED |
 | D9.2 | Maximum candles between the two core events (0 = both on the same candle is allowed) | ★ 10 | OPEN |
 | D9.3 | Several sweeps before one shift (e.g. Asia low, then PDL, then CHoCH) | a) ★ all attach to the setup and are used up; the stop goes beyond the most extreme one · b) only the most recent attaches | OPEN |
 | D9.4 | **Location** requirement (zone, FVG, key level) | a) ★ at least one location factor required · b) location is shown on the checklist only · c) a specific one is required (say which) | OPEN |
@@ -223,3 +223,4 @@ These questions set the remaining details.
 | 2026-09-25 | D1.1 | Reconfirmed: 08:00 Chicago (09:00 New York) is intended | Your answer |
 | 2026-09-25 | D6.4 | Decided: a) internal | Your answer |
 | 2026-09-25 | D7.3 | Decided: a) break structure (internal layer) | Your answer |
+| 2026-09-25 | D9.1 | Decided: T1, T2 and T3 enabled | Your answer |
