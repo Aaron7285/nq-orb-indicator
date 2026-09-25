@@ -35,6 +35,7 @@ Status key: `OPEN` · `DECIDED` · `CHANGED` (decided, then revised; see change 
 | D2.1 ❗ | Timeframe(s) **you trade** on | **5m primary**; 1m also used | DECIDED |
 | D2.2 | Timeframes **officially supported and tested** | **1m and 5m** (from the D2.1 answer). Other timeframes are untested and show a notice. | DECIDED |
 | D2.3 ❗ | Your **TradingView plan** | **Pro** | DECIDED |
+| D2.4 | How **durations** are defined (Model B expiry, cooldown, max gap between core events, false-breakout window) | **In minutes**, so they behave the same on 1m and 5m. A duration ends on the first candle close at or after start + duration. Structure sensitivity (D6.1/D6.2) stays in candles, because it's a shape, not a duration. | DECIDED |
 
 ## D3 — Breakout confirmation (ORB)
 
@@ -50,7 +51,7 @@ Status key: `OPEN` · `DECIDED` · `CHANGED` (decided, then revised; see change 
 | ID | Question | Options | Status |
 |---|---|---|---|
 | D4.1 | Definition of an ORB **false breakout** | a) ★ a confirmed breakout (D3.1), then a candle **closes back inside** the range within N candles · b) same, but the close back must also be beyond the ORB **midpoint** | OPEN |
-| D4.2 | N (candles allowed for the failure) | ★ 3 | OPEN |
+| D4.2 | Time allowed for the failure (minutes, per D2.4) | ★ 15 minutes (3 candles on 5m) | OPEN |
 | D4.3 | A wick through the ORB level that **closes inside** with no confirmed breakout | a) ★ recorded as an **"ORB sweep"** (a liquidity event, kept separate from a false breakout) · b) treated as a false breakout · c) ignored | OPEN |
 
 ## D5 — Liquidity and sweeps
@@ -115,7 +116,7 @@ setup, alone or together.
 | ID | Question | Options | Status |
 |---|---|---|---|
 | D9.1 ❗ | Which **setup types** are enabled (choose any) | **All three: T1, T2 and T3** | DECIDED |
-| D9.2 | Maximum candles between the two core events (0 = both on the same candle is allowed) | ★ 10 | OPEN |
+| D9.2 | Maximum time between the two core events (minutes, per D2.4; 0 = both on the same candle is allowed) | ★ 50 minutes (10 candles on 5m) | OPEN |
 | D9.3 | Several sweeps before one shift (e.g. Asia low, then PDL, then CHoCH) | a) ★ all attach to the setup and are used up; the stop goes beyond the most extreme one · b) only the most recent attaches | OPEN |
 | D9.4 | **Location** requirement (zone, FVG, key level) | a) ★ at least one location factor required · b) location is shown on the checklist only · c) a specific one is required (say which) | OPEN |
 | D9.5 | **Session** filter | a) ★ hard filter: setups form only inside sessions you mark as tradeable (D15.2) · b) checklist item only | OPEN |
@@ -141,7 +142,7 @@ retest level and wait for a later candle to reach it.
 | D10.4 ❗ | Model B: **retest level** | **b) FVG 50 %**. If several qualifying FVGs exist (which ones qualify: D8.4), use the **most recent one, closest to current price**. | DECIDED |
 | D10.5 | Model B: the chosen level doesn't exist for this setup (e.g. no FVG formed) | a) ★ the setup is rejected (no substitute) · b) fall back to another level (say which) | OPEN |
 | D10.6 | Model B: **fill** rule | a) price touches the limit · b) ★ price trades through the limit by ≥ 1 tick (more conservative) | OPEN |
-| D10.7 ❗ | Model B: **expiry**, in candles without a fill | a number | OPEN |
+| D10.7 ❗ | Model B: **expiry**, in candles without a fill | **30 minutes** (6 candles on 5m, 30 candles on 1m) | DECIDED |
 | D10.8 | Model B: TP1 is reached before a fill | a) ★ setup ends as MISSED · b) keep waiting | OPEN |
 | D10.9 | Accept the conservative fill/outcome conventions in `entry_models.md` §4 | ★ accept | OPEN |
 
@@ -182,7 +183,7 @@ These questions set the remaining details.
 |---|---|---|---|
 | D14.1 | Live setups at the same time | a) ★ **one** in total, either direction · b) one per direction | OPEN |
 | D14.2 | **Cooldown** type after a setup ends | a) N candles · b) until the next session starts · c) ★ N candles, **and** then a new core event is required | OPEN |
-| D14.3 ❗ | Cooldown length N (candles) | a number (e.g. 5) | OPEN |
+| D14.3 ❗ | Cooldown length (minutes, per D2.4) | a number of minutes | OPEN |
 | D14.4 | Which events may build the next setup | a) ★ only events confirmed **after** the previous setup ended **and** its cooldown finished (strict) · b) only the final trigger event must be new; earlier unused events may be reused | OPEN |
 | D14.5 | Can the event that stopped or invalidated a setup be used for an opposite setup? | a) ★ no: it's used up · b) yes, after cooldown | OPEN |
 | D14.6 ❗ | Extra requirement for an **opposite-direction** setup after a setup ends | a) nothing beyond D14.4 · b) the shift must be on the swing layer · c) needs a new sweep **and** a new shift | OPEN |
@@ -234,3 +235,5 @@ These questions set the remaining details.
 | 2026-09-25 | D9.12 | Added and decided: ORB position shown, not counted toward M | Your answer |
 | 2026-09-25 | D10.2 | Decided: default entry model B (Limit Retest) | Your answer |
 | 2026-09-25 | D10.4 | Decided: b) FVG 50 %; with several FVGs, use the most recent one closest to price | Your answer |
+| 2026-09-25 | D10.7 | Decided: 30 minutes | Your answer |
+| 2026-09-25 | D2.4 | Added and decided: durations in minutes; D4.2, D9.2 and D14.3 restated in minutes | Your answer (with D10.7) |
