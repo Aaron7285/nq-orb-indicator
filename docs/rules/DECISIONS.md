@@ -100,8 +100,9 @@ This delay is shown honestly and is never hidden.
 | D7.3 ❗ | The displacement must **also** | **a) break structure**, on the **internal** layer | DECIDED |
 | D7.4 | Zone **bounds** | a) ★ full base candle range (wick to wick) · b) near edge = body, far edge = wick | OPEN |
 | D7.5 | Zone **invalidation** | a) ★ candle **closes** beyond the far edge · b) wick beyond the far edge | OPEN |
-| D7.6 | **Retire** a zone after | ★ 2 tests (or specify a number of sessions) | OPEN |
+| D7.6 | **Retire** a zone after | ★ 2 tests. A **test** = price trades into the zone, then a candle closes back outside it on the original side. | OPEN |
 | D7.7 | Maximum zones **shown per side** | ★ 2 | OPEN |
+| D7.8 | When the optional item **"zone ✓"** counts for a setup | a) the setup's stop-anchor point (sweep extreme for T1/T3, BOS-origin swing for T2) is inside an active zone of the setup's direction, i.e. the move started from the zone · b) the Model B limit entry lies inside such a zone · c) either | OPEN |
 
 ## D8 — Fair value gaps (FVG)
 
@@ -109,8 +110,10 @@ This delay is shown honestly and is never hidden.
 |---|---|---|---|
 | D8.1 | **Minimum size** | a) X points · b) k × ATR · c) ★ whichever is larger (e.g. 2 points or 0.25 × ATR(14)) | OPEN |
 | D8.2 | When an FVG counts as **filled** | a) ★ price trades through the far edge · b) price reaches the 50 % level | OPEN |
-| D8.3 | Maximum open FVGs **shown per side** | ★ 3 | OPEN |
-| D8.4 | Which FVG counts for **confluence** | a) ★ only an FVG created by the setup's own displacement · b) any open FVG price is currently retesting · c) either | OPEN |
+| D8.3 | Maximum open FVGs **shown per side** | ★ 3 (display only: the active setup's FVG is always shown, and gaps that aren't drawn still count for setups) | OPEN |
+| D8.4 | Which FVG counts for **confluence and the Model B entry** (D10.4) | a) ★ only an FVG created by the setup's own displacement · b) any open FVG price is currently retesting · c) either | OPEN |
+| D8.5 | Definition of the setup's **own move** (for D8.4) | ★ the candles from the stop-anchor point (sweep extreme for T1/T3, BOS-origin swing for T2) up to and including the trigger candle | OPEN |
+| D8.6 | A gap created by the **trigger candle itself** is only confirmed on the **next** candle (the third candle of the pattern) | a) not usable: only gaps already confirmed when the trigger candle closes count · b) ★ usable: the setup waits one more candle. If that candle confirms the gap, the limit, R:R and stop checks happen then (still exactly once). If not, and no earlier gap exists, the setup is rejected ("no FVG"). | OPEN |
 
 ## D9 — Confluence: core requirements
 
@@ -289,3 +292,4 @@ These questions set the remaining details.
 | 2026-09-25 | D6.6 | Decided: a) the most recent confirmed opposite swing | Group 3 answer |
 | 2026-09-25 | D6.7 | Decided: a) internal CHoCH only (the internal trend must flip) | Group 3 answer |
 | 2026-09-25 | D6.8 | Decided: a) internal BOS only (the internal trend must already point in the breakout direction) | Group 3 answer |
+| 2026-09-25 | D7.8, D8.5, D8.6 | Added: zone ✓ definition, own-move definition, trigger-candle gap timing; clarified D7.6, D8.3, D8.4 wording | Gaps found while reviewing Group 4 |
