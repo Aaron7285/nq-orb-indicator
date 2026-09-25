@@ -3,6 +3,25 @@
 Versions follow the phases in [docs/PLAN.md](docs/PLAN.md): each completed phase raises
 the version. The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.1.0] — 2026-09-25 — Phase 1: core
+
+### Added
+- Core modules in `src/core/`:
+  - `base`: Candle record, Chicago timezone
+  - `time`: trading day C1, session windows R1, minute durations, supported timeframes
+  - `price`: tick math, C9 limit rounding, Wilder ATR(14)
+  - `levels`: level record and the touch/sweep/break engine, C2–C5, C7
+  - `events`: event IDs and the daily store
+  - `budget`: per-module drawing budgets
+  - `theme`: dark/light palette from `DESIGN.md`
+  - `status`: version line and untested-timeframe notice
+  - `selftest`: the PASS/FAIL table framework
+- `dist/test/core_test.pine`: 31 scripted self-tests (TESTING.md §3.1).
+- Core rulebook `docs/rules/core.md`, approved with definitions C1–C9.
+
+### Removed
+- The Phase 0 pipeline-check placeholder.
+
 ## [0.0.0] — 2026-09-25 — Phase 0: project setup
 
 ### Added

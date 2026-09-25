@@ -1,7 +1,6 @@
 # Rulebook — Core (Phase 1)
 
-**Status:** DRAFT, awaiting your approval. Definitions marked **C1–C9** make the approved
-rules precise at the level of single candles; they need your approval (§10).
+**Status:** approved 2026-09-25, including definitions C1–C9 (§10). Implemented in v0.1.0.
 **Built in:** Phase 1. **Depends on:** nothing. Every other module depends on the core.
 All times are **Chicago** (`America/Chicago`). 1 tick = 0.25 pt.
 
@@ -108,7 +107,7 @@ instead of above).
 | used | False until attached to a setup or rejected candidate; then true for good (L-2) |
 
 - **Event ID** = kind : direction : level ID : confirming-candle time. For example,
-  `SWEEP:+1:LOL-20260925:1790330700000`. Two events are the same only if all four parts
+  `SWEEP:+1:LOL-20260925:1790343900000` (a sweep of the London low confirmed by the 08:45 candle on 2026-09-25). Two events are the same only if all four parts
   match (lifecycle §3).
 - **Level ID** = kind + trading day for daily levels (e.g. `PDH-20260925`), or kind +
   swing time for swing-based levels (e.g. `EQH-1790322600000`).
@@ -148,8 +147,11 @@ display presets and the clutter budget in `DESIGN.md` §8–9.
 
 - A test indicator (for example `dist/test/core_test.pine`) contains **scripted candles**
   (open, high, low, close, open time, close time) and the expected result of each case.
-- It feeds those candles into the module functions one per chart bar, **ignoring the
-  real chart data**. So it gives the same result on any symbol, timeframe or date.
+- Every module works on explicit `Candle` records. The test indicator builds scripted
+  candles and passes them straight to the module code on the chart's last bar,
+  **ignoring the real chart data**. So it gives the same result on any symbol, timeframe
+  or date. The one exception is PX-04, which deliberately compares the core ATR with
+  TradingView's own `ta.atr(14)` on your real chart candles.
 - **Each scenario starts from a clean state.** The scripted times use real Chicago dates,
   including a daylight-saving change, so time rules are tested exactly.
 - On the last bar it shows a table: **ID · what is tested · expected · got · PASS/FAIL**,
@@ -157,7 +159,7 @@ display presets and the clutter budget in `DESIGN.md` §8–9.
 - The module code under test is **the same code** that goes into `dist/NQ_ORB.pine`. The
   build joins the same files into both.
 
-## 10. Definitions that need your approval
+## 10. Approved definitions
 
 | # | Definition |
 |---|---|

@@ -8,9 +8,11 @@ stop, targets and status.
 It shows **conditions that are present**. It never claims a setup is profitable or "high
 probability", and it has no scores, win rates or AI ratings.
 
-> **Status: Phase 0 (project setup) complete, version 0.0.0.** The indicator in `dist/`
-> is currently only a *pipeline check*: it proves the build-to-TradingView workflow and
-> contains no trading logic yet. See [the development plan](docs/PLAN.md) for the phases.
+> **Status: version 0.1.0, Phase 1 (core) implemented.** The core is the shared foundation
+> (clock, price math, touch/sweep/break engine, events, drawing budget, colors, self-tests).
+> It has **no visible trading features yet**; the indicator only shows a small version line.
+> Its test indicator is [`dist/test/core_test.pine`](dist/test/core_test.pine). See
+> [the development plan](docs/PLAN.md) for the phases.
 
 ## Install in TradingView
 

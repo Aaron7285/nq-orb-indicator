@@ -1,0 +1,25 @@
+// @module core/theme
+// @description Dark/light detection and the DESIGN.md color tokens (rules/core.md §8).
+
+// Every module takes its colors from THEME; no module types its own hex color.
+type Theme
+    color bull
+    color bear
+    color accent
+    color ink
+    color ink2
+    color faint
+
+th_isDarkBg(color bg) =>
+    0.299 * color.r(bg) + 0.587 * color.g(bg) + 0.114 * color.b(bg) < 128
+
+// DESIGN.md §2.1. Validated values: re-run the palette validator before changing them.
+th_make(bool dark) =>
+    Theme t = na
+    if dark
+        t := Theme.new(#1BA995, #B45C5E, #B08E21, #D1D4DC, #9598A1, #5D606B)
+    else
+        t := Theme.new(#1B9786, #A05052, #B48630, #131722, #5D606B, #9598A1)
+    t
+
+var Theme THEME = th_make(th_isDarkBg(chart.bg_color))

@@ -1,0 +1,91 @@
+// @module core/levels
+// @requires core/base
+// @description Level record and the level-interaction engine: touch, sweep or break (rules/core.md §4–5).
+
+LV_SWEEP_MIN_TICKS = 2
+LV_TOUCH_TICKS = 2
+
+// Interaction results
+LV_NONE = 0
+LV_TOUCH = 1
+LV_SWEEP = 2
+LV_BREAK = 3
+
+// Level states (D5.9: SWEPT and BROKEN are final)
+LV_ACTIVE = 0
+LV_SWEPT = 1
+LV_BROKEN = 2
+
+// isHigh: a high-type level sits above price and is swept upward; low-type is the mirror.
+// knownAt: close time (ms) of the candle on which the level became final.
+type Level
+    string kind
+    string id
+    bool isHigh
+    float price
+    int knownAt
+    int state = 0
+    bool sweepable = true
+    bool targetable = true
+    int endedAt
+
+lv_new(string kind, string id, bool isHigh, float price, int knownAt, bool sweepable) =>
+    Level.new(kind = kind, id = id, isHigh = isHigh, price = price, knownAt = knownAt, state = LV_ACTIVE, sweepable = sweepable, targetable = true)
+
+// Daily levels: kind + trading day, e.g. "PDH-20260925". Swing-based: kind + swing time.
+lv_dailyId(string kind, int tradingDay) =>
+    kind + "-" + str.tostring(tradingDay)
+
+lv_swingId(string kind, int swingTime) =>
+    kind + "-" + str.tostring(swingTime)
+
+// A sweep of a high is bearish (-1); a sweep of a low is bullish (+1).
+lv_sweepDir(bool isHigh) =>
+    isHigh ? -1 : 1
+
+// The engine (rules/core.md §5): judges one closed candle against one price.
+// C4 order break > sweep > touch · C2 a close exactly at the level is not a break ·
+// C3 near-misses are touches · R7 a close exactly at the midpoint counts as the far half.
+lv_classify(bool isHigh, float price, Candle c, float tick) =>
+    float eps = tick * 1e-6
+    float mid = (c.h + c.l) / 2.0
+    int result = LV_NONE
+    if isHigh
+        if c.c > price + eps
+            result := LV_BREAK
+        else if c.h - price >= LV_SWEEP_MIN_TICKS * tick - eps and c.c <= mid + eps
+            result := LV_SWEEP
+        else if c.h >= price - LV_TOUCH_TICKS * tick - eps
+            result := LV_TOUCH
+    else
+        if c.c < price - eps
+            result := LV_BREAK
+        else if price - c.l >= LV_SWEEP_MIN_TICKS * tick - eps and c.c >= mid - eps
+            result := LV_SWEEP
+        else if c.l <= price + LV_TOUCH_TICKS * tick + eps
+            result := LV_TOUCH
+    result
+
+// Judges an ACTIVE level against a closed candle and updates its state.
+// C5: only candles that open at or after the level became known are judged.
+method judge(Level this, Candle c, float tick) =>
+    int result = LV_NONE
+    if this.state == LV_ACTIVE and c.t >= this.knownAt
+        result := lv_classify(this.isHigh, this.price, c, tick)
+        if result == LV_SWEEP
+            this.state := LV_SWEPT
+            this.endedAt := c.tc
+        else if result == LV_BREAK
+            this.state := LV_BROKEN
+            this.endedAt := c.tc
+    result
+
+// R6: untouched = not yet swept or broken (touches don't count).
+method isUntouched(Level this) =>
+    this.state == LV_ACTIVE
+
+lv_resultName(int r) =>
+    r == LV_TOUCH ? "TOUCH" : r == LV_SWEEP ? "SWEEP" : r == LV_BREAK ? "BREAK" : "none"
+
+lv_stateName(int s) =>
+    s == LV_SWEPT ? "SWEPT" : s == LV_BROKEN ? "BROKEN" : "ACTIVE"

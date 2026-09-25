@@ -1,0 +1,61 @@
+// @module core/events
+// @requires core/base
+// @description Event record, unique event IDs and the per-day event store (rules/core.md §6).
+
+EV_MAX_PER_DAY = 300
+
+// confirmedAt / confirmedClose: open and close time of the confirming candle.
+// extreme: the wick extreme for sweeps and failures (used for stops, D11.1 / R2).
+// used: set once the event is attached to a setup or rejected candidate (L-2).
+type Event
+    string kind
+    int dir
+    string levelId
+    float levelPrice
+    float extreme
+    int confirmedAt
+    int confirmedClose
+    bool used = false
+    string id
+
+// kind : direction : level ID : confirming-candle open time,
+// e.g. "SWEEP:+1:LOL-20260925:1790343900000".
+ev_makeId(string kind, int dir, string levelId, int confirmedAt) =>
+    kind + ":" + (dir > 0 ? "+1" : "-1") + ":" + (levelId == "" ? "-" : levelId) + ":" + str.tostring(confirmedAt)
+
+ev_new(string kind, int dir, string levelId, float levelPrice, float extreme, Candle c) =>
+    Event.new(kind = kind, dir = dir, levelId = levelId, levelPrice = levelPrice, extreme = extreme, confirmedAt = c.t, confirmedClose = c.tc, used = false, id = ev_makeId(kind, dir, levelId, c.t))
+
+method markUsed(Event this) =>
+    this.used := true
+    this
+
+// One trading day of events; cleared at the daily reset (17:00 Chicago).
+type EventStore
+    array<Event> items
+    int day
+
+ev_newStore() =>
+    EventStore.new(array.new<Event>(), na)
+
+method add(EventStore this, Event e) =>
+    this.items.push(e)
+    if this.items.size() > EV_MAX_PER_DAY
+        this.items.shift()
+    e
+
+// Clears the store when a new trading day starts. Returns true if it did.
+method resetIfNewDay(EventStore this, int tradingDay) =>
+    bool isNew = na(this.day) or tradingDay != this.day
+    if isNew
+        this.items.clear()
+        this.day := tradingDay
+    isNew
+
+method findById(EventStore this, string id) =>
+    Event found = na
+    for e in this.items
+        if e.id == id
+            found := e
+            break
+    found

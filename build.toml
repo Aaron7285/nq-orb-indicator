@@ -20,14 +20,14 @@ max_lines_count = 500
 max_labels_count = 500
 max_boxes_count = 500
 
-# The full product. Phase 0: only the pipeline check (no trading logic).
+# The full product. Phase 1: the core (no visible trading features yet).
 [targets.main]
 output = "dist/NQ_ORB.pine"
 title = "NQ.ORB"
-modules = ["core/pipeline_check"]
+modules = ["core/levels", "core/events", "core/price", "core/budget", "core/status"]
 
-# Standalone test indicators are added here from Phase 1 onward, e.g.:
-# [targets.test_core]
-# output = "dist/test/core_test.pine"
-# title = "NQ.ORB test: core"
-# modules = ["tests/core_selftest"]
+# Standalone test indicators (one per module, TESTING.md §3).
+[targets.test_core]
+output = "dist/test/core_test.pine"
+title = "NQ.ORB test: core"
+modules = ["tests/core_selftest"]

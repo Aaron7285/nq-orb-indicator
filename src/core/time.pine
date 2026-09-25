@@ -1,0 +1,36 @@
+// @module core/time
+// @requires core/base
+// @description Trading day, session windows, minute-based durations and timeframe support (rules/core.md §2).
+
+TM_MS_PER_MIN = 60000
+TM_MS_PER_HOUR = 3600000
+
+// Chicago clock time as minutes after midnight, e.g. tm_hhmm(8, 30) = 510.
+tm_hhmm(int h, int m) =>
+    h * 60 + m
+
+tm_minuteOfDay(int t) =>
+    hour(t, CORE_TZ) * 60 + minute(t, CORE_TZ)
+
+// C1: the trading day runs 17:00 -> 16:00 Chicago. A candle belongs to the Chicago
+// calendar date of its open time + 7 hours. Returned as yyyymmdd.
+tm_tradingDay(int t) =>
+    int shifted = t + 7 * TM_MS_PER_HOUR
+    year(shifted, CORE_TZ) * 10000 + month(shifted, CORE_TZ) * 100 + dayofmonth(shifted, CORE_TZ)
+
+// R1: a candle is in a window if it opens at or after the start and closes at or
+// before the end. Start and end are Chicago minutes of the day; a window whose end
+// is earlier than its start crosses midnight.
+tm_inWindow(Candle c, int startMin, int endMin) =>
+    int openMin = tm_minuteOfDay(c.t)
+    int closeMin = openMin + int(math.round((c.tc - c.t) / 60000.0))
+    startMin < endMin ? (openMin >= startMin and closeMin <= endMin) : (openMin >= startMin or closeMin <= endMin)
+
+// D2.4 / R8: a duration that starts at startMs has ended on the first candle that
+// closes at or after startMs + minutes.
+tm_durationDone(int startMs, int minutes, int candleClose) =>
+    candleClose >= startMs + minutes * TM_MS_PER_MIN
+
+// D2.2: 1m and 5m charts are supported; other timeframes run with a notice.
+tm_supportedTf(string tf) =>
+    tf == "1" or tf == "5"

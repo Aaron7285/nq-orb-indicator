@@ -1,0 +1,53 @@
+// @module core/selftest
+// @requires core/theme
+// @description Self-test framework: records cases and shows the PASS/FAIL table (rules/core.md §9).
+
+type TestResult
+    string id
+    string what
+    string expected
+    string got
+    bool pass
+
+type TestSuite
+    string name
+    array<TestResult> results
+
+st_new(string name) =>
+    TestSuite.new(name, array.new<TestResult>())
+
+method record(TestSuite this, string id, string what, string expected, string got, bool pass) =>
+    this.results.push(TestResult.new(id, what, expected, got, pass))
+    pass
+
+// Passes when the got text equals the expected text exactly.
+method check(TestSuite this, string id, string what, string expected, string got) =>
+    this.record(id, what, expected, got, expected == got)
+
+st_yn(bool b) =>
+    b ? "yes" : "no"
+
+st_num(float x) =>
+    str.tostring(x, "#.####")
+
+// Summary in the top row, then one row per case. Shown top-right.
+method render(TestSuite this) =>
+    var table grid = table.new(position.top_right, 5, 64, bgcolor = color.new(THEME.ink, 94), frame_color = THEME.faint, frame_width = 1)
+    int passed = 0
+    for r in this.results
+        if r.pass
+            passed += 1
+    int n = this.results.size()
+    bool ok = n > 0 and passed == n
+    table.cell(grid, 0, 0, this.name + " " + str.tostring(passed) + "/" + str.tostring(n) + (ok ? " PASS" : " FAIL"), text_color = ok ? THEME.bull : THEME.bear, text_size = size.small, text_halign = text.align_left, text_font_family = font.family_monospace)
+    array<string> head = array.from("ID", "What is tested", "Expected", "Got", "Result")
+    for [col, h] in head
+        table.cell(grid, col, 1, h, text_color = THEME.ink2, text_size = size.small, text_halign = text.align_left)
+    for [i, r] in this.results
+        int row = i + 2
+        table.cell(grid, 0, row, r.id, text_color = THEME.ink2, text_size = size.small, text_halign = text.align_left, text_font_family = font.family_monospace)
+        table.cell(grid, 1, row, r.what, text_color = THEME.ink, text_size = size.small, text_halign = text.align_left)
+        table.cell(grid, 2, row, r.expected, text_color = THEME.ink2, text_size = size.small, text_halign = text.align_left, text_font_family = font.family_monospace)
+        table.cell(grid, 3, row, r.got, text_color = THEME.ink, text_size = size.small, text_halign = text.align_left, text_font_family = font.family_monospace)
+        table.cell(grid, 4, row, r.pass ? "PASS" : "FAIL", text_color = r.pass ? THEME.bull : THEME.bear, text_size = size.small, text_font_family = font.family_monospace)
+    ok

@@ -45,7 +45,7 @@ Test indicator: `dist/test/core_test.pine`. Scripted candles use tick 0.25.
 | LI-01 | High 99.50, close 99.00 | **TOUCH** (within 2 ticks); the level stays active |
 | LI-02 | High 100.50, low 99.00, close 99.50 (≤ midpoint 99.75) | **SWEEP**; the level becomes SWEPT |
 | LI-03 | High 100.25 (1 tick through), close 99.50 | **TOUCH** (C3) |
-| LI-04 | High 100.50, low 99.00, close 99.90 (above midpoint 99.75) | **TOUCH**, not a sweep (C3) |
+| LI-04 | High 100.50, low 98.50, close 99.75 (above midpoint 99.50) | **TOUCH**, not a sweep (C3) |
 | LI-05 | Close 100.25 | **BREAK**; the level becomes BROKEN |
 | LI-06 | LI-02, then another sweep candle | **No** second event |
 | LI-07 | High 100.50, low 99.00, close exactly 99.75 (the midpoint) | **SWEEP** (R7) |
@@ -66,7 +66,7 @@ Test indicator: `dist/test/core_test.pine`. Scripted candles use tick 0.25.
 | TM-04 | 5m candles, 30 min from the 09:05 close | Ends on the candle closing at 09:35 |
 | TM-05 | 08:00 Chicago on the Monday after the March and after the November clock change | Both correct |
 | TM-06 | Timeframe 1m, 5m / 3m, 15m, 60m | Supported / notice shown |
-| TM-07 | The first candle of a new trading day | Event store cleared, morning count reset |
+| TM-07 | Same trading day / the first candle of a new trading day | Event store kept / cleared (the morning setup count is reset by the lifecycle module, Phase 9) |
 
 **Price (PX)**
 
@@ -224,3 +224,5 @@ more or fewer setups. A day with zero setups is a valid result.
 |---|---|---|---|---|
 | 2026-09-25 | Phase 0 / tooling | L0 | PASS | 32 tool self-tests, lint (0 problems), build check: all pass locally |
 | 2026-09-25 | Phase 0 / pipeline check | L1 | PASS | Compiled and added to an NQ1! 5m chart in TradingView with no errors (reported by you) |
+| 2026-09-25 | Phase 1 / core | L0 | PASS | Build, lint (10 files, 0 problems) and 32 tool tests pass |
+| — | Phase 1 / core | L1 + L2 | *waiting for you* | Add `dist/test/core_test.pine` (expect **CORE 31/31 PASS**) and `dist/NQ_ORB.pine` (expect only the grey version line) |

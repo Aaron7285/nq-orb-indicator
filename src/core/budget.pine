@@ -1,0 +1,50 @@
+// @module core/budget
+// @description Per-module drawing budgets within TradingView's 500-object limits (rules/core.md §7).
+
+// [lines, labels, boxes] each module may keep. Unknown owners get nothing.
+db_limits(string owner) =>
+    switch owner
+        "orb" => array.from(20, 20, 10)
+        "liquidity" => array.from(80, 80, 0)
+        "structure" => array.from(60, 60, 0)
+        "fvg" => array.from(20, 0, 80)
+        "zones" => array.from(0, 0, 40)
+        "sessions" => array.from(40, 20, 20)
+        "setups" => array.from(80, 80, 20)
+        "notices" => array.from(20, 20, 0)
+        => array.from(0, 0, 0)
+
+var array<string> DB_OWNERS = array.from("orb", "liquidity", "structure", "fvg", "zones", "sessions", "setups", "notices")
+
+type DrawPool
+    string owner
+    int maxLines
+    int maxLabels
+    int maxBoxes
+    array<line> lines
+    array<label> labels
+    array<box> boxes
+
+db_newPool(string owner) =>
+    array<int> lim = db_limits(owner)
+    DrawPool.new(owner, lim.get(0), lim.get(1), lim.get(2), array.new<line>(), array.new<label>(), array.new<box>())
+
+// Each add keeps the new object; when the pool is over budget, its oldest objects
+// are deleted first (only older history is affected, never the live morning).
+method addLine(DrawPool this, line obj) =>
+    this.lines.push(obj)
+    while this.lines.size() > this.maxLines
+        line.delete(this.lines.shift())
+    obj
+
+method addLabel(DrawPool this, label obj) =>
+    this.labels.push(obj)
+    while this.labels.size() > this.maxLabels
+        label.delete(this.labels.shift())
+    obj
+
+method addBox(DrawPool this, box obj) =>
+    this.boxes.push(obj)
+    while this.boxes.size() > this.maxBoxes
+        box.delete(this.boxes.shift())
+    obj

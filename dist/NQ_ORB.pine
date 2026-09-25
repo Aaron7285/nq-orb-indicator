@@ -1,28 +1,377 @@
 // ============================================================================
-// NQ.ORB · v0.0.0
+// NQ.ORB · v0.1.0
 // GENERATED FILE. Do not edit by hand: edit the files in src/ and tests/,
 // then run `python tools/build.py`.
-// Modules: core/pipeline_check
+// Modules: core/base, core/levels, core/events, core/price, core/budget, core/theme, core/time, core/status
 // ============================================================================
 //@version=6
 indicator("NQ.ORB", shorttitle = "NQ.ORB", overlay = true, max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
 
 // Build constants (generated)
-NQORB_VERSION = "0.0.0"
+NQORB_VERSION = "0.1.0"
 NQORB_TARGET = "main"
 
 
 // ============================================================================
-// MODULE core/pipeline_check  (src/core/pipeline_check.pine)
-// Phase 0 placeholder: proves the build-to-TradingView pipeline works. No trading logic; replaced in Phase 1.
+// MODULE core/base  (src/core/base.pine)
+// Shared constants and the Candle record every module reads candles through.
 // ============================================================================
 
-// A small, quiet status line in the bottom-right corner. Its ink is derived from
-// the chart's own text color, so it stays readable on dark and light charts
-// (docs/DESIGN.md §2.3).
-var table pipelineStatus = table.new(position.bottom_right, 1, 1)
+// All clock times in NQ.ORB are Chicago times (D1.2, D15.3).
+CORE_TZ = "America/Chicago"
+
+// One candle, passed explicitly, so the same logic runs on chart candles and on
+// scripted self-test candles (rules/core.md §9).
+type Candle
+    float o
+    float h
+    float l
+    float c
+    int t
+    int tc
+
+// The current chart candle (t = open time, tc = close time, both in ms).
+// Modules only process it once it has closed (barstate.isconfirmed).
+core_chartCandle() =>
+    Candle.new(open, high, low, close, time, time_close)
+
+
+// ============================================================================
+// MODULE core/levels  (src/core/levels.pine)
+// Level record and the level-interaction engine: touch, sweep or break (rules/core.md §4–5).
+// ============================================================================
+
+LV_SWEEP_MIN_TICKS = 2
+LV_TOUCH_TICKS = 2
+
+// Interaction results
+LV_NONE = 0
+LV_TOUCH = 1
+LV_SWEEP = 2
+LV_BREAK = 3
+
+// Level states (D5.9: SWEPT and BROKEN are final)
+LV_ACTIVE = 0
+LV_SWEPT = 1
+LV_BROKEN = 2
+
+// isHigh: a high-type level sits above price and is swept upward; low-type is the mirror.
+// knownAt: close time (ms) of the candle on which the level became final.
+type Level
+    string kind
+    string id
+    bool isHigh
+    float price
+    int knownAt
+    int state = 0
+    bool sweepable = true
+    bool targetable = true
+    int endedAt
+
+lv_new(string kind, string id, bool isHigh, float price, int knownAt, bool sweepable) =>
+    Level.new(kind = kind, id = id, isHigh = isHigh, price = price, knownAt = knownAt, state = LV_ACTIVE, sweepable = sweepable, targetable = true)
+
+// Daily levels: kind + trading day, e.g. "PDH-20260925". Swing-based: kind + swing time.
+lv_dailyId(string kind, int tradingDay) =>
+    kind + "-" + str.tostring(tradingDay)
+
+lv_swingId(string kind, int swingTime) =>
+    kind + "-" + str.tostring(swingTime)
+
+// A sweep of a high is bearish (-1); a sweep of a low is bullish (+1).
+lv_sweepDir(bool isHigh) =>
+    isHigh ? -1 : 1
+
+// The engine (rules/core.md §5): judges one closed candle against one price.
+// C4 order break > sweep > touch · C2 a close exactly at the level is not a break ·
+// C3 near-misses are touches · R7 a close exactly at the midpoint counts as the far half.
+lv_classify(bool isHigh, float price, Candle c, float tick) =>
+    float eps = tick * 1e-6
+    float mid = (c.h + c.l) / 2.0
+    int result = LV_NONE
+    if isHigh
+        if c.c > price + eps
+            result := LV_BREAK
+        else if c.h - price >= LV_SWEEP_MIN_TICKS * tick - eps and c.c <= mid + eps
+            result := LV_SWEEP
+        else if c.h >= price - LV_TOUCH_TICKS * tick - eps
+            result := LV_TOUCH
+    else
+        if c.c < price - eps
+            result := LV_BREAK
+        else if price - c.l >= LV_SWEEP_MIN_TICKS * tick - eps and c.c >= mid - eps
+            result := LV_SWEEP
+        else if c.l <= price + LV_TOUCH_TICKS * tick + eps
+            result := LV_TOUCH
+    result
+
+// Judges an ACTIVE level against a closed candle and updates its state.
+// C5: only candles that open at or after the level became known are judged.
+method judge(Level this, Candle c, float tick) =>
+    int result = LV_NONE
+    if this.state == LV_ACTIVE and c.t >= this.knownAt
+        result := lv_classify(this.isHigh, this.price, c, tick)
+        if result == LV_SWEEP
+            this.state := LV_SWEPT
+            this.endedAt := c.tc
+        else if result == LV_BREAK
+            this.state := LV_BROKEN
+            this.endedAt := c.tc
+    result
+
+// R6: untouched = not yet swept or broken (touches don't count).
+method isUntouched(Level this) =>
+    this.state == LV_ACTIVE
+
+lv_resultName(int r) =>
+    r == LV_TOUCH ? "TOUCH" : r == LV_SWEEP ? "SWEEP" : r == LV_BREAK ? "BREAK" : "none"
+
+lv_stateName(int s) =>
+    s == LV_SWEPT ? "SWEPT" : s == LV_BROKEN ? "BROKEN" : "ACTIVE"
+
+
+// ============================================================================
+// MODULE core/events  (src/core/events.pine)
+// Event record, unique event IDs and the per-day event store (rules/core.md §6).
+// ============================================================================
+
+EV_MAX_PER_DAY = 300
+
+// confirmedAt / confirmedClose: open and close time of the confirming candle.
+// extreme: the wick extreme for sweeps and failures (used for stops, D11.1 / R2).
+// used: set once the event is attached to a setup or rejected candidate (L-2).
+type Event
+    string kind
+    int dir
+    string levelId
+    float levelPrice
+    float extreme
+    int confirmedAt
+    int confirmedClose
+    bool used = false
+    string id
+
+// kind : direction : level ID : confirming-candle open time,
+// e.g. "SWEEP:+1:LOL-20260925:1790343900000".
+ev_makeId(string kind, int dir, string levelId, int confirmedAt) =>
+    kind + ":" + (dir > 0 ? "+1" : "-1") + ":" + (levelId == "" ? "-" : levelId) + ":" + str.tostring(confirmedAt)
+
+ev_new(string kind, int dir, string levelId, float levelPrice, float extreme, Candle c) =>
+    Event.new(kind = kind, dir = dir, levelId = levelId, levelPrice = levelPrice, extreme = extreme, confirmedAt = c.t, confirmedClose = c.tc, used = false, id = ev_makeId(kind, dir, levelId, c.t))
+
+method markUsed(Event this) =>
+    this.used := true
+    this
+
+// One trading day of events; cleared at the daily reset (17:00 Chicago).
+type EventStore
+    array<Event> items
+    int day
+
+ev_newStore() =>
+    EventStore.new(array.new<Event>(), na)
+
+method add(EventStore this, Event e) =>
+    this.items.push(e)
+    if this.items.size() > EV_MAX_PER_DAY
+        this.items.shift()
+    e
+
+// Clears the store when a new trading day starts. Returns true if it did.
+method resetIfNewDay(EventStore this, int tradingDay) =>
+    bool isNew = na(this.day) or tradingDay != this.day
+    if isNew
+        this.items.clear()
+        this.day := tradingDay
+    isNew
+
+method findById(EventStore this, string id) =>
+    Event found = na
+    for e in this.items
+        if e.id == id
+            found := e
+            break
+    found
+
+
+// ============================================================================
+// MODULE core/price  (src/core/price.pine)
+// Tick math, the C9 limit rounding rule and Wilder's ATR(14) (rules/core.md §3).
+// ============================================================================
+
+PX_EPS = 1e-9
+
+px_ticks(float points, float tick) =>
+    points / tick
+
+px_points(float ticks, float tick) =>
+    ticks * tick
+
+// C9: a limit that falls exactly between two ticks goes on the tick closer to the
+// current price: the higher tick for a long (dir = 1), the lower for a short (dir = -1).
+// Anything else rounds to the nearest tick.
+px_limitPrice(float raw, float tick, int dir) =>
+    float n = raw / tick
+    float below = math.floor(n)
+    float frac = n - below
+    float steps = frac > 0.5 + PX_EPS ? below + 1 : frac < 0.5 - PX_EPS ? below : dir > 0 ? below + 1 : below
+    steps * tick
+
+// C6: Wilder's ATR, identical to ta.atr(length), fed one closed candle at a time.
+// The first value appears on the length-th candle (the average of the first
+// `length` true ranges); after that it is smoothed with alpha = 1 / length.
+type Atr
+    int length = 14
+    int count = 0
+    float sumTr = 0.0
+    float value
+    float prevClose
+
+method update(Atr this, Candle c) =>
+    float tr = na(this.prevClose) ? c.h - c.l : math.max(c.h - c.l, math.abs(c.h - this.prevClose), math.abs(c.l - this.prevClose))
+    this.count += 1
+    if na(this.value)
+        this.sumTr += tr
+        if this.count >= this.length
+            this.value := this.sumTr / this.length
+    else
+        float alpha = 1.0 / this.length
+        this.value := alpha * tr + (1 - alpha) * this.value
+    this.prevClose := c.c
+    this.value
+
+
+// ============================================================================
+// MODULE core/budget  (src/core/budget.pine)
+// Per-module drawing budgets within TradingView's 500-object limits (rules/core.md §7).
+// ============================================================================
+
+// [lines, labels, boxes] each module may keep. Unknown owners get nothing.
+db_limits(string owner) =>
+    switch owner
+        "orb" => array.from(20, 20, 10)
+        "liquidity" => array.from(80, 80, 0)
+        "structure" => array.from(60, 60, 0)
+        "fvg" => array.from(20, 0, 80)
+        "zones" => array.from(0, 0, 40)
+        "sessions" => array.from(40, 20, 20)
+        "setups" => array.from(80, 80, 20)
+        "notices" => array.from(20, 20, 0)
+        => array.from(0, 0, 0)
+
+var array<string> DB_OWNERS = array.from("orb", "liquidity", "structure", "fvg", "zones", "sessions", "setups", "notices")
+
+type DrawPool
+    string owner
+    int maxLines
+    int maxLabels
+    int maxBoxes
+    array<line> lines
+    array<label> labels
+    array<box> boxes
+
+db_newPool(string owner) =>
+    array<int> lim = db_limits(owner)
+    DrawPool.new(owner, lim.get(0), lim.get(1), lim.get(2), array.new<line>(), array.new<label>(), array.new<box>())
+
+// Each add keeps the new object; when the pool is over budget, its oldest objects
+// are deleted first (only older history is affected, never the live morning).
+method addLine(DrawPool this, line obj) =>
+    this.lines.push(obj)
+    while this.lines.size() > this.maxLines
+        line.delete(this.lines.shift())
+    obj
+
+method addLabel(DrawPool this, label obj) =>
+    this.labels.push(obj)
+    while this.labels.size() > this.maxLabels
+        label.delete(this.labels.shift())
+    obj
+
+method addBox(DrawPool this, box obj) =>
+    this.boxes.push(obj)
+    while this.boxes.size() > this.maxBoxes
+        box.delete(this.boxes.shift())
+    obj
+
+
+// ============================================================================
+// MODULE core/theme  (src/core/theme.pine)
+// Dark/light detection and the DESIGN.md color tokens (rules/core.md §8).
+// ============================================================================
+
+// Every module takes its colors from THEME; no module types its own hex color.
+type Theme
+    color bull
+    color bear
+    color accent
+    color ink
+    color ink2
+    color faint
+
+th_isDarkBg(color bg) =>
+    0.299 * color.r(bg) + 0.587 * color.g(bg) + 0.114 * color.b(bg) < 128
+
+// DESIGN.md §2.1. Validated values: re-run the palette validator before changing them.
+th_make(bool dark) =>
+    Theme t = na
+    if dark
+        t := Theme.new(#1BA995, #B45C5E, #B08E21, #D1D4DC, #9598A1, #5D606B)
+    else
+        t := Theme.new(#1B9786, #A05052, #B48630, #131722, #5D606B, #9598A1)
+    t
+
+var Theme THEME = th_make(th_isDarkBg(chart.bg_color))
+
+
+// ============================================================================
+// MODULE core/time  (src/core/time.pine)
+// Trading day, session windows, minute-based durations and timeframe support (rules/core.md §2).
+// ============================================================================
+
+TM_MS_PER_MIN = 60000
+TM_MS_PER_HOUR = 3600000
+
+// Chicago clock time as minutes after midnight, e.g. tm_hhmm(8, 30) = 510.
+tm_hhmm(int h, int m) =>
+    h * 60 + m
+
+tm_minuteOfDay(int t) =>
+    hour(t, CORE_TZ) * 60 + minute(t, CORE_TZ)
+
+// C1: the trading day runs 17:00 -> 16:00 Chicago. A candle belongs to the Chicago
+// calendar date of its open time + 7 hours. Returned as yyyymmdd.
+tm_tradingDay(int t) =>
+    int shifted = t + 7 * TM_MS_PER_HOUR
+    year(shifted, CORE_TZ) * 10000 + month(shifted, CORE_TZ) * 100 + dayofmonth(shifted, CORE_TZ)
+
+// R1: a candle is in a window if it opens at or after the start and closes at or
+// before the end. Start and end are Chicago minutes of the day; a window whose end
+// is earlier than its start crosses midnight.
+tm_inWindow(Candle c, int startMin, int endMin) =>
+    int openMin = tm_minuteOfDay(c.t)
+    int closeMin = openMin + int(math.round((c.tc - c.t) / 60000.0))
+    startMin < endMin ? (openMin >= startMin and closeMin <= endMin) : (openMin >= startMin or closeMin <= endMin)
+
+// D2.4 / R8: a duration that starts at startMs has ended on the first candle that
+// closes at or after startMs + minutes.
+tm_durationDone(int startMs, int minutes, int candleClose) =>
+    candleClose >= startMs + minutes * TM_MS_PER_MIN
+
+// D2.2: 1m and 5m charts are supported; other timeframes run with a notice.
+tm_supportedTf(string tf) =>
+    tf == "1" or tf == "5"
+
+
+// ============================================================================
+// MODULE core/status  (src/core/status.pine)
+// Quiet version line in the bottom-right corner, plus the untested-timeframe notice (D2.2).
+// ============================================================================
+
+var table coreStatus = table.new(position.bottom_right, 1, 1)
 if barstate.islast
-    table.cell(pipelineStatus, 0, 0, "NQ.ORB " + NQORB_VERSION + " · pipeline check · no trading logic yet", text_color = color.new(chart.fg_color, 35), text_size = size.small)
+    string note = tm_supportedTf(timeframe.period) ? "" : " · untested timeframe: use 1m or 5m"
+    table.cell(coreStatus, 0, 0, "NQ.ORB " + NQORB_VERSION + note, text_color = THEME.ink2, text_size = size.small)
 
 // Every indicator needs at least one output call; this hidden plot provides it.
-plot(float(na), "Pipeline check", display = display.none)
+plot(float(na), "NQ.ORB", display = display.none)

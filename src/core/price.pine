@@ -1,0 +1,44 @@
+// @module core/price
+// @requires core/base
+// @description Tick math, the C9 limit rounding rule and Wilder's ATR(14) (rules/core.md §3).
+
+PX_EPS = 1e-9
+
+px_ticks(float points, float tick) =>
+    points / tick
+
+px_points(float ticks, float tick) =>
+    ticks * tick
+
+// C9: a limit that falls exactly between two ticks goes on the tick closer to the
+// current price: the higher tick for a long (dir = 1), the lower for a short (dir = -1).
+// Anything else rounds to the nearest tick.
+px_limitPrice(float raw, float tick, int dir) =>
+    float n = raw / tick
+    float below = math.floor(n)
+    float frac = n - below
+    float steps = frac > 0.5 + PX_EPS ? below + 1 : frac < 0.5 - PX_EPS ? below : dir > 0 ? below + 1 : below
+    steps * tick
+
+// C6: Wilder's ATR, identical to ta.atr(length), fed one closed candle at a time.
+// The first value appears on the length-th candle (the average of the first
+// `length` true ranges); after that it is smoothed with alpha = 1 / length.
+type Atr
+    int length = 14
+    int count = 0
+    float sumTr = 0.0
+    float value
+    float prevClose
+
+method update(Atr this, Candle c) =>
+    float tr = na(this.prevClose) ? c.h - c.l : math.max(c.h - c.l, math.abs(c.h - this.prevClose), math.abs(c.l - this.prevClose))
+    this.count += 1
+    if na(this.value)
+        this.sumTr += tr
+        if this.count >= this.length
+            this.value := this.sumTr / this.length
+    else
+        float alpha = 1.0 / this.length
+        this.value := alpha * tr + (1 - alpha) * this.value
+    this.prevClose := c.c
+    this.value

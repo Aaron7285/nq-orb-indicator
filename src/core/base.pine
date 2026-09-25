@@ -1,0 +1,20 @@
+// @module core/base
+// @description Shared constants and the Candle record every module reads candles through.
+
+// All clock times in NQ.ORB are Chicago times (D1.2, D15.3).
+CORE_TZ = "America/Chicago"
+
+// One candle, passed explicitly, so the same logic runs on chart candles and on
+// scripted self-test candles (rules/core.md §9).
+type Candle
+    float o
+    float h
+    float l
+    float c
+    int t
+    int tc
+
+// The current chart candle (t = open time, tc = close time, both in ms).
+// Modules only process it once it has closed (barstate.isconfirmed).
+core_chartCandle() =>
+    Candle.new(open, high, low, close, time, time_close)

@@ -1,0 +1,150 @@
+// @module tests/core_selftest
+// @requires core/selftest, core/base, core/time, core/price, core/levels, core/events, core/budget, core/theme
+// @description Core self-tests (TESTING.md §3.1): 31 scripted cases shown in a PASS/FAIL table. Works on any chart.
+
+T_TICK = 0.25
+T_BASE = timestamp(CORE_TZ, 2026, 9, 21, 9, 0)
+
+// Scripted 5-minute candle number k after T_BASE (Monday 2026-09-21 09:00 Chicago).
+t_bar(int k, float o, float h, float l, float c) =>
+    Candle.new(o, h, l, c, T_BASE + k * 5 * TM_MS_PER_MIN, T_BASE + (k + 1) * 5 * TM_MS_PER_MIN)
+
+// Judges one scripted candle against a fresh high-type level at `price` (clean state per case).
+t_judgeHigh(float price, Candle c) =>
+    Level lvl = lv_new("T", "T-1", true, price, T_BASE, true)
+    lv_resultName(lvl.judge(c, T_TICK))
+
+// First candle close (HH:mm Chicago) that ends a duration, for candles of `candleMin` minutes.
+t_durationEnd(int startMs, int minutes, int candleMin) =>
+    int endClose = na
+    for k = 0 to 120
+        int cl = startMs + (k + 1) * candleMin * TM_MS_PER_MIN
+        if tm_durationDone(startMs, minutes, cl)
+            endClose := cl
+            break
+    str.format_time(endClose, "HH:mm", CORE_TZ)
+
+// PX-04: the core ATR must equal ta.atr(14) on every closed chart candle.
+var Atr t_atr = Atr.new()
+var float t_atrMaxDiff = 0.0
+var int t_atrCompared = 0
+var int t_atrStartMismatch = 0
+float t_refAtr = ta.atr(14)
+if barstate.isconfirmed
+    float mine = t_atr.update(core_chartCandle())
+    if na(mine) != na(t_refAtr)
+        t_atrStartMismatch += 1
+    else if not na(mine)
+        t_atrMaxDiff := math.max(t_atrMaxDiff, math.abs(mine - t_refAtr))
+        t_atrCompared += 1
+
+if barstate.islast
+    TestSuite s = st_new("CORE")
+
+    // ---- Level interaction: high-type level at 100.00 unless stated
+    s.check("LI-01", "High 2 ticks below, no penetration", "TOUCH", t_judgeHigh(100.0, t_bar(0, 99.0, 99.5, 98.5, 99.0)))
+    Level l2 = lv_new("T", "T-2", true, 100.0, T_BASE, true)
+    string r2 = lv_resultName(l2.judge(t_bar(0, 99.5, 100.5, 99.0, 99.5), T_TICK))
+    s.check("LI-02", "2 ticks through, closes back in far half", "SWEEP · SWEPT", r2 + " · " + lv_stateName(l2.state))
+    s.check("LI-03", "Only 1 tick through (C3)", "TOUCH", t_judgeHigh(100.0, t_bar(0, 99.5, 100.25, 99.0, 99.5)))
+    s.check("LI-04", "Through, but closes in near half (C3)", "TOUCH", t_judgeHigh(100.0, t_bar(0, 99.5, 100.5, 98.5, 99.75)))
+    Level l5 = lv_new("T", "T-5", true, 100.0, T_BASE, true)
+    string r5 = lv_resultName(l5.judge(t_bar(0, 99.5, 100.5, 99.5, 100.25), T_TICK))
+    s.check("LI-05", "Closes beyond the level", "BREAK · BROKEN", r5 + " · " + lv_stateName(l5.state))
+    Level l6 = lv_new("T", "T-6", true, 100.0, T_BASE, true)
+    l6.judge(t_bar(0, 99.5, 100.5, 99.0, 99.5), T_TICK)
+    s.check("LI-06", "Already swept level, swept again", "none", lv_resultName(l6.judge(t_bar(1, 99.5, 100.5, 99.0, 99.5), T_TICK)))
+    s.check("LI-07", "Close exactly at the midpoint (R7)", "SWEEP", t_judgeHigh(100.0, t_bar(0, 99.5, 100.5, 99.0, 99.75)))
+    s.check("LI-08", "Close exactly at the level (C2)", "SWEEP", t_judgeHigh(100.0, t_bar(0, 99.75, 100.5, 99.5, 100.0)))
+    Level l9 = lv_new("T", "T-9", true, 100.0, T_BASE + 5 * TM_MS_PER_MIN, true)
+    string r9a = lv_resultName(l9.judge(t_bar(0, 99.5, 100.5, 99.0, 99.5), T_TICK))
+    string r9b = lv_resultName(l9.judge(t_bar(1, 99.5, 100.5, 99.0, 99.5), T_TICK))
+    s.check("LI-09", "Not judged on its own creating candle (C5)", "none, then SWEEP", r9a + ", then " + r9b)
+    Level l10 = lv_new("T", "T-10", false, 100.0, T_BASE, true)
+    string r10 = lv_resultName(l10.judge(t_bar(0, 100.5, 101.0, 99.5, 100.5), T_TICK))
+    s.check("LI-10", "Low-type level, mirrored", "SWEEP, bullish", r10 + ", " + (lv_sweepDir(false) > 0 ? "bullish" : "bearish"))
+    Candle c11 = t_bar(0, 99.5, 100.75, 99.0, 99.5)
+    Level a11 = lv_new("T", "T-11a", true, 100.0, T_BASE, true)
+    Level b11 = lv_new("T", "T-11b", true, 100.25, T_BASE, true)
+    s.check("LI-11", "Two levels swept by one candle (C7)", "SWEEP + SWEEP", lv_resultName(a11.judge(c11, T_TICK)) + " + " + lv_resultName(b11.judge(c11, T_TICK)))
+    s.check("LI-12", "Big wick and close beyond (C4)", "BREAK", t_judgeHigh(100.0, t_bar(0, 100.0, 103.0, 99.5, 100.25)))
+    s.check("LI-13", "High 3 ticks below the level", "none", t_judgeHigh(100.0, t_bar(0, 99.0, 99.25, 98.75, 99.0)))
+
+    // ---- Time
+    string tm1a = str.tostring(tm_tradingDay(timestamp(CORE_TZ, 2026, 9, 21, 16, 55)))
+    string tm1b = str.tostring(tm_tradingDay(timestamp(CORE_TZ, 2026, 9, 21, 17, 0)))
+    s.check("TM-01", "Trading day, Mon 16:55 / Mon 17:00 (C1)", "20260921 / 20260922", tm1a + " / " + tm1b)
+    array<int> tm2Opens = array.from(timestamp(CORE_TZ, 2026, 9, 22, 8, 25), timestamp(CORE_TZ, 2026, 9, 22, 8, 30), timestamp(CORE_TZ, 2026, 9, 22, 10, 55), timestamp(CORE_TZ, 2026, 9, 22, 11, 0))
+    array<string> tm2Got = array.new<string>()
+    for o in tm2Opens
+        tm2Got.push(st_yn(tm_inWindow(Candle.new(0, 0, 0, 0, o, o + 5 * TM_MS_PER_MIN), tm_hhmm(8, 30), tm_hhmm(11, 0))))
+    s.check("TM-02", "In NY AM: 5m opens 08:25/08:30/10:55/11:00 (R1)", "no,yes,yes,no", tm2Got.join(","))
+    s.check("TM-03", "1m: 30 min from the 09:02 close", "09:32", t_durationEnd(timestamp(CORE_TZ, 2026, 9, 22, 9, 2), 30, 1))
+    s.check("TM-04", "5m: 30 min from the 09:05 close", "09:35", t_durationEnd(timestamp(CORE_TZ, 2026, 9, 22, 9, 5), 30, 5))
+    string tm5a = str.format_time(timestamp(CORE_TZ, 2026, 3, 9, 8, 0), "HH:mm", "UTC")
+    string tm5b = str.format_time(timestamp(CORE_TZ, 2026, 11, 2, 8, 0), "HH:mm", "UTC")
+    s.check("TM-05", "08:00 Chicago after the Mar / Nov clock change, in UTC", "13:00 / 14:00", tm5a + " / " + tm5b)
+    array<string> tm6Got = array.new<string>()
+    for tf in array.from("1", "5", "3", "15", "60")
+        tm6Got.push(st_yn(tm_supportedTf(tf)))
+    s.check("TM-06", "Supported timeframes 1/5/3/15/60 (D2.2)", "yes,yes,no,no,no", tm6Got.join(","))
+    EventStore st7 = ev_newStore()
+    st7.resetIfNewDay(20260921)
+    st7.add(ev_new("SWEEP", 1, "X-1", 100.0, 99.5, t_bar(0, 100.0, 100.0, 100.0, 100.0)))
+    st7.resetIfNewDay(20260921)
+    int kept7 = st7.items.size()
+    st7.resetIfNewDay(20260922)
+    s.check("TM-07", "Event store at same day / new trading day", "kept 1 · cleared 0", "kept " + str.tostring(kept7) + " · cleared " + str.tostring(st7.items.size()))
+
+    // ---- Price
+    s.check("PX-01", "Limit at 50 % of FVG 100.00–101.00", "100.5", st_num(px_limitPrice((100.0 + 101.0) / 2, T_TICK, 1)))
+    s.check("PX-02", "50 % = 100.375: long / short (C9)", "100.5 / 100.25", st_num(px_limitPrice(100.375, T_TICK, 1)) + " / " + st_num(px_limitPrice(100.375, T_TICK, -1)))
+    s.check("PX-03", "20 points in ticks", "80", st_num(px_ticks(20.0, T_TICK)))
+    string px4 = "diff " + str.tostring(t_atrMaxDiff, "0.0000000000") + " · " + str.tostring(t_atrCompared) + " candles · start mismatches " + str.tostring(t_atrStartMismatch)
+    s.record("PX-04", "Core ATR(14) vs ta.atr(14) on this chart (C6)", "diff ≤ 1e-9 · 0 start mismatches", px4, t_atrCompared > 0 and t_atrMaxDiff <= 1e-9 and t_atrStartMismatch == 0)
+
+    // ---- Events
+    int evT = timestamp(CORE_TZ, 2026, 9, 25, 8, 45)
+    Candle evC = Candle.new(100.0, 100.0, 99.0, 100.0, evT, evT + 5 * TM_MS_PER_MIN)
+    Event e1 = ev_new("SWEEP", 1, "LOL-20260925", 100.0, 99.0, evC)
+    Event e1b = ev_new("SWEEP", 1, "LOL-20260925", 100.0, 99.0, evC)
+    s.check("EV-01", "Same event twice gives the same ID", "SWEEP:+1:LOL-20260925:1790343900000 (same)", e1.id + (e1.id == e1b.id ? " (same)" : " (different)"))
+    Event e2 = ev_new("SWEEP", 1, "ASL-20260925", 100.0, 99.0, evC)
+    s.check("EV-02", "Two levels swept on one candle", "different IDs", e1.id != e2.id ? "different IDs" : "same ID")
+    EventStore st3 = ev_newStore()
+    st3.add(e1)
+    e1.markUsed()
+    Event f3 = st3.findById(e1.id)
+    s.check("EV-03", "A used event stays used in the store", "used", na(f3) ? "missing" : f3.used ? "used" : "unused")
+    EventStore st4 = ev_newStore()
+    for k = 0 to EV_MAX_PER_DAY + 4
+        st4.add(ev_new("SWEEP", 1, "L-" + str.tostring(k), 100.0, 99.0, t_bar(k, 100.0, 100.0, 100.0, 100.0)))
+    s.check("EV-04", "305 events in one day", "300 kept · oldest L-5", str.tostring(st4.items.size()) + " kept · oldest " + st4.items.first().levelId)
+
+    // ---- Drawing budget
+    DrawPool p1 = DrawPool.new("test", 20, 0, 0, array.new<line>(), array.new<label>(), array.new<box>())
+    int linesBefore = line.all.size()
+    for k = 1 to 25
+        p1.addLine(line.new(bar_index - k, close, bar_index, close, color = color.new(THEME.faint, 100)))
+    int keptLines = p1.lines.size()
+    int onChart = line.all.size() - linesBefore
+    for ln in p1.lines
+        line.delete(ln)
+    s.check("DB-01", "Budget 20 lines, 25 created", "20 kept · 20 on chart", str.tostring(keptLines) + " kept · " + str.tostring(onChart) + " on chart")
+    int sumLines = 0
+    int sumLabels = 0
+    int sumBoxes = 0
+    for owner in DB_OWNERS
+        array<int> lim = db_limits(owner)
+        sumLines += lim.get(0)
+        sumLabels += lim.get(1)
+        sumBoxes += lim.get(2)
+    s.record("DB-02", "All budgets within 500 lines / labels / boxes", "320 / 280 / 170", str.tostring(sumLines) + " / " + str.tostring(sumLabels) + " / " + str.tostring(sumBoxes), sumLines <= 500 and sumLabels <= 500 and sumBoxes <= 500)
+
+    // ---- Theme
+    s.check("TH-01", "Background #131722 / #FFFFFF", "dark / light", (th_isDarkBg(#131722) ? "dark" : "light") + " / " + (th_isDarkBg(#FFFFFF) ? "dark" : "light"))
+
+    s.render()
+
+// Every indicator needs at least one output call; this hidden plot provides it.
+plot(float(na), "Self-test", display = display.none)

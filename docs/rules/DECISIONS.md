@@ -345,3 +345,4 @@ These questions set the remaining details.
 | 2026-09-25 | D15.3 | Decided: a) all sessions in Chicago time (fixed clock times all year) | Group 7 answer |
 | 2026-09-25 | D15.4 | Decided: a) only the most recent ones, replaced each day | Group 7 answer |
 | 2026-09-25 | All | Rule set approved, including derived definitions R1–R13 (SUMMARY.md §9) | Your approval |
+| 2026-09-25 | C1–C9 | Core rulebook definitions approved (`rules/core.md` §10) | Your approval |

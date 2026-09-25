@@ -2,8 +2,8 @@
 
 An NQ/MNQ intraday trading indicator for TradingView, built around an 08:00 Chicago opening range.
 
-**Status:** Rules approved (2026-09-25; `docs/rules/SUMMARY.md`). **Phase 0 (project setup)
-complete, v0.0.0.** Next: Phase 1 (core).
+**Status:** Rules approved (2026-09-25; `docs/rules/SUMMARY.md`). **Phase 0 complete (v0.0.0).
+Phase 1 (core) implemented (v0.1.0)**, waiting for your TradingView test (L1 + L2).
 **Architecture:** approved (modules + build tool), 2026-09-25.
 
 ---
@@ -236,7 +236,7 @@ It's built only from decided answers:
 |---|---|---|---|
 | **R** | Rules lock: `DECISIONS.md`, `SUMMARY.md` and the rulebooks ✓ **done** | — | Approved 2026-09-25 |
 | 0 | Tooling: build.py, lint.py, GitHub check, DESIGN.md, README ✓ **done (v0.0.0)** | R | Build + lint pass ✓ |
-| 1 | Core: types, event IDs, time/tick/ATR helpers, level-interaction engine, drawing budget, self-test framework | 0 | Core self-tests pass |
+| 1 | Core: types, event IDs, time/tick/ATR helpers, level-interaction engine, drawing budget, self-test framework: **implemented (v0.1.0)** | 0 | Core self-tests pass (waiting for you) |
 | 2 | Sessions | 1 | Module workflow (§10) |
 | 3 | Opening range (breakout, false breakout, ORB sweep) | 2 | §10 |
 | 4 | Market structure (swing + internal, BOS, CHoCH) | 1 | §10 |
