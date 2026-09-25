@@ -5,7 +5,7 @@
 // Modules: core/theme, core/selftest, core/base, core/time, core/price, core/levels, core/events, core/budget, tests/core_selftest
 // ============================================================================
 //@version=6
-indicator("NQ.ORB test: core", shorttitle = "NQ.ORB test: core", overlay = true, max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
+indicator("NQ.ORB test: core", shorttitle = "T-core", overlay = true, max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
 
 // Build constants (generated)
 NQORB_VERSION = "0.2.0"

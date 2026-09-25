@@ -30,9 +30,11 @@ modules = ["core/levels", "core/events", "core/price", "core/budget", "modules/s
 [targets.test_core]
 output = "dist/test/core_test.pine"
 title = "NQ.ORB test: core"
+shorttitle = "T-core"
 modules = ["tests/core_selftest"]
 
 [targets.test_sessions]
 output = "dist/test/sessions_test.pine"
 title = "NQ.ORB test: sessions"
+shorttitle = "T-sess"
 modules = ["tests/sessions_selftest"]
