@@ -2,8 +2,8 @@
 
 An NQ/MNQ intraday trading indicator for TradingView, built around an 08:00 Chicago opening range.
 
-**Status:** Rules approved (2026-09-25; `docs/rules/SUMMARY.md`). Phases 0–1 complete (core 31/31 PASS in TradingView).
-**Phase 2 (sessions) implemented (v0.2.0)**, waiting for your TradingView test.
+**Status:** Rules approved (2026-09-25; `docs/rules/SUMMARY.md`). Phases 0–2 complete (core 31/31, sessions 13/13 PASS in TradingView).
+**Next: Phase 3 (opening range)**, rulebook `docs/rules/orb.md` awaiting approval.
 **Architecture:** approved (modules + build tool), 2026-09-25.
 
 ---
@@ -237,7 +237,7 @@ It's built only from decided answers:
 | **R** | Rules lock: `DECISIONS.md`, `SUMMARY.md` and the rulebooks ✓ **done** | — | Approved 2026-09-25 |
 | 0 | Tooling: build.py, lint.py, GitHub check, DESIGN.md, README ✓ **done (v0.0.0)** | R | Build + lint pass ✓ |
 | 1 | Core: types, event IDs, time/tick/ATR helpers, level-interaction engine, drawing budget, self-test framework ✓ **done (v0.1.0)** | 0 | Core 31/31 PASS ✓ |
-| 2 | Sessions: **implemented (v0.2.0)** | 1 | SE 13/13 PASS (waiting for you) |
+| 2 | Sessions ✓ **done (v0.2.x)** | 1 | SE 13/13 PASS ✓, visual ✓ |
 | 3 | Opening range (breakout, false breakout, ORB sweep) | 2 | §10 |
 | 4 | Market structure (swing + internal, BOS, CHoCH) | 1 | §10 |
 | 5 | FVG | 1 | §10 |

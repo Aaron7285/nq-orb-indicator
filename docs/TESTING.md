@@ -246,4 +246,4 @@ more or fewer setups. A day with zero setups is a valid result.
 | 2026-09-25 | Phase 1 / core | L1 + L2 | PASS | CORE 31/31 PASS in TradingView; PX-04: diff 0 over 5554 candles, 0 start mismatches (screenshot from you) |
 | 2026-09-25 | Phase 2 / sessions | L0 | PASS | Build, lint (13 files, 0 problems), 32 tool tests |
 | 2026-09-25 | Phase 2 / sessions | L1 + L2 | PASS | SESSIONS 13/13 PASS in TradingView (screenshot from you) |
-| — | Phase 2 / sessions | L6 (visual) | *waiting for you* | Updated `dist/NQ_ORB.pine` on NQ1! 5m/1m: faint Asia/London outlines |
+| 2026-09-25 | Phase 2 / sessions | L6 (visual) | PASS | MNQ1! 1m ETH, 3 days: Asia 19:00–23:00 and London 01:00–04:00 outlines correct, faint, uncluttered. Note: the chart must be in ETH mode (RTH hides overnight candles; warning added in v0.2.1) |
