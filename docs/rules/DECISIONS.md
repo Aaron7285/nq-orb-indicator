@@ -160,11 +160,12 @@ retest level and wait for a later candle to reach it.
 
 | ID | Question | Options | Status |
 |---|---|---|---|
-| D12.1 ❗ | **TP1** | a) fixed R multiple (value?) · b) nearest opposing liquidity pool · c) nearest opposing pool at least X R away | OPEN |
+| D12.1 ❗ | **TP1** | **b) nearest untouched opposing liquidity level** (level list per D5.1), placed **a set number of ticks before** the level (D12.6). No level beyond entry means the setup is rejected ("no target"). | DECIDED |
 | D12.2 ❗ | **TP2** | a) fixed R multiple · b) second opposing pool · c) day or session high/low | OPEN |
 | D12.3 ❗ | **Minimum R:R** to TP1 for a setup to be created | a) none · b) X R | OPEN |
 | D12.4 ❗ | After TP1 is hit | a) stop unchanged · b) stop moves to entry (breakeven) · c) setup ends at TP1 | OPEN |
 | D12.5 ❗ | Setup still active when the trading window/session ends | a) closed at that candle's close · b) stays open until stop or target | OPEN |
+| D12.6 ❗ | Target offset: **how many ticks before** the liquidity level the target sits (1 tick = 0.25 pt) | a number of ticks | OPEN |
 
 ## D13 — Setup invalidation
 
@@ -240,3 +241,5 @@ These questions set the remaining details.
 | 2026-09-25 | D11.2 | Decided: a) T2 stop beyond the internal swing the BOS move started from | Your answer |
 | 2026-09-25 | D11.4 | Decided: maximum stop 30 points | Your answer |
 | 2026-09-25 | D11.5 | Decided: minimum stop 5 points (reject below) | Your answer |
+| 2026-09-25 | D12.1 | Decided: b) nearest untouched opposing liquidity level, placed before the level | Your answer |
+| 2026-09-25 | D12.6 | Added: exact tick offset for targets ("a few ticks" needs a number) | Follow-up to D12.1 |
