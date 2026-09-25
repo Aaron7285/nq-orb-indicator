@@ -91,7 +91,7 @@ This delay is shown honestly and is never hidden.
 |---|---|---|---|
 | D7.1 | Zone **base** | a) ★ the last opposite-colored candle before the displacement (most objective) · b) 1–3 small-bodied candles (body ≤ X × ATR) · c) either | OPEN |
 | D7.2 | **Displacement** threshold: candle body ≥ k × ATR(14) | ★ k = 1.5 | OPEN |
-| D7.3 ❗ | The displacement must **also** | a) break structure · b) leave an FVG · c) both · d) either | OPEN |
+| D7.3 ❗ | The displacement must **also** | **a) break structure**, on the **internal** layer | DECIDED |
 | D7.4 | Zone **bounds** | a) ★ full base candle range (wick to wick) · b) near edge = body, far edge = wick | OPEN |
 | D7.5 | Zone **invalidation** | a) ★ candle **closes** beyond the far edge · b) wick beyond the far edge | OPEN |
 | D7.6 | **Retire** a zone after | ★ 2 tests (or specify a number of sessions) | OPEN |
@@ -222,3 +222,4 @@ These questions set the remaining details.
 | 2026-09-25 | D16.1 | Decided: NQ.ORB | Your answer |
 | 2026-09-25 | D1.1 | Reconfirmed: 08:00 Chicago (09:00 New York) is intended | Your answer |
 | 2026-09-25 | D6.4 | Decided: a) internal | Your answer |
+| 2026-09-25 | D7.3 | Decided: a) break structure (internal layer) | Your answer |
