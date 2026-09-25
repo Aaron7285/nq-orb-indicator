@@ -187,11 +187,12 @@ These questions set the remaining details.
 | D14.3 ❗ | Cooldown length (minutes, per D2.4) | **30 minutes**, the same after every outcome, measured from the close of the candle where the outcome happened | DECIDED |
 | D14.4 | Which events may build the next setup | a) ★ only events confirmed **after** the previous setup ended **and** its cooldown finished (strict) · b) only the final trigger event must be new; earlier unused events may be reused | OPEN |
 | D14.5 | Can the event that stopped or invalidated a setup be used for an opposite setup? | a) ★ no: it's used up · b) yes, after cooldown | OPEN |
-| D14.6 ❗ | Extra requirement for an **opposite-direction** setup after a setup ends | a) nothing beyond D14.4 · b) the shift must be on the swing layer · c) needs a new sweep **and** a new shift | OPEN |
+| D14.6 ❗ | Extra requirement for an **opposite-direction** setup after a setup ends | **a) nothing extra**: an opposite setup is treated like any other (still needs new events after cooldown) | DECIDED |
 | D14.7 | A candidate **rejected** by a filter (stop too large, R:R too low, outside session, cap) | a) ★ never re-evaluated: each event combination is checked exactly once, on the candle its final event confirms · b) may be re-checked for N candles | OPEN |
 | D14.8 ❗ | Maximum setups **per session** | a) no cap · b) X | OPEN |
 | D14.9 ❗ | Maximum setups **per day** | a) no cap · b) X | OPEN |
 | D14.10 ❗ | After a STOPPED setup, can a **same-direction** setup form later in the same session? | a) yes, with new events (D14.4) · b) no | OPEN |
+| D14.11 | Does "previous setup" reset each morning? | **Yes.** The previous setup only affects setups within the **same morning**; yesterday's setups never affect today's. | DECIDED |
 
 ## D15 — Sessions
 
@@ -249,3 +250,5 @@ These questions set the remaining details.
 | 2026-09-25 | D12.4 | Decided: b) breakeven stop after TP1 | Your answer |
 | 2026-09-25 | D12.5 | Decided: a) close open setups at the 11:00 Chicago candle close | Your answer |
 | 2026-09-25 | D14.3 | Decided: 30-minute cooldown after every outcome | Your answer |
+| 2026-09-25 | D14.6 | Decided: a) nothing extra for opposite-direction setups | Your answer |
+| 2026-09-25 | D14.11 | Added and decided: previous-setup rules reset each morning | Your answer |
