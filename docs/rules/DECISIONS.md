@@ -184,7 +184,7 @@ These questions set the remaining details.
 |---|---|---|---|
 | D14.1 | Live setups at the same time | a) ★ **one** in total, either direction · b) one per direction | OPEN |
 | D14.2 | **Cooldown** type after a setup ends | a) N candles · b) until the next session starts · c) ★ N candles, **and** then a new core event is required | OPEN |
-| D14.3 ❗ | Cooldown length (minutes, per D2.4) | a number of minutes | OPEN |
+| D14.3 ❗ | Cooldown length (minutes, per D2.4) | **30 minutes**, the same after every outcome, measured from the close of the candle where the outcome happened | DECIDED |
 | D14.4 | Which events may build the next setup | a) ★ only events confirmed **after** the previous setup ended **and** its cooldown finished (strict) · b) only the final trigger event must be new; earlier unused events may be reused | OPEN |
 | D14.5 | Can the event that stopped or invalidated a setup be used for an opposite setup? | a) ★ no: it's used up · b) yes, after cooldown | OPEN |
 | D14.6 ❗ | Extra requirement for an **opposite-direction** setup after a setup ends | a) nothing beyond D14.4 · b) the shift must be on the swing layer · c) needs a new sweep **and** a new shift | OPEN |
@@ -248,3 +248,4 @@ These questions set the remaining details.
 | 2026-09-25 | D12.3 | Decided: minimum R:R 1.0 to TP1 | Your answer |
 | 2026-09-25 | D12.4 | Decided: b) breakeven stop after TP1 | Your answer |
 | 2026-09-25 | D12.5 | Decided: a) close open setups at the 11:00 Chicago candle close | Your answer |
+| 2026-09-25 | D14.3 | Decided: 30-minute cooldown after every outcome | Your answer |
