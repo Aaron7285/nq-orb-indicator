@@ -135,6 +135,7 @@ setup, alone or together.
 | D9.10 | One event combination matches two setup types (e.g. an ORB sweep + shift fits both T1 and T3) | Only one setup is ever created (LC-1). It's labelled a) ★ as the more specific type (T3 over T1) · b) as T1 | OPEN |
 | D9.11 | When "at a key level" counts as an optional item | **Only when the setup is at a different key level from the one used by its two core events** | DECIDED |
 | D9.12 | ORB position (above / inside / below) on the checklist | **Shown on the checklist, not counted toward M.** It's fixed by setup type (always ✓ for T2, always ✗ for T3). | DECIDED |
+| D9.13 | When a setup is **"at" a different key level** (D9.11) | ★ c) either the stop-anchor point **or** the Model B limit entry is within the D5.8 tolerance (larger of 4 ticks and 0.1 × ATR) of a D5.1-list level other than the core events' level. This mirrors D7.8. Levels already swept or broken **still count** here, because a broken level often acts as support or resistance. Alternatives: a) stop-anchor point only · b) limit entry only · d) untouched levels only | OPEN |
 
 ## D10 — Entry models
 
@@ -306,3 +307,4 @@ These questions set the remaining details.
 | 2026-09-25 | D8.4 | Decided: a) only an FVG created by the setup's own move (for confluence and the Model B entry) | Group 4 answer |
 | 2026-09-25 | D8.5 | Decided: The candles from the stop-anchor point (sweep extreme for T1/T3, BOS-origin swing for T2) up to and including the trigger candle | Group 4 answer |
 | 2026-09-25 | D8.6 | Decided: b) usable: wait one more candle for the trigger candle's gap to confirm, then place the limit and run the stop/R:R checks (once). No gap and no earlier gap: rejected ("no FVG"). | Group 4 answer |
+| 2026-09-25 | D9.13 | Added: definition of "at a different key level" | Gap found while reviewing Group 5 |
