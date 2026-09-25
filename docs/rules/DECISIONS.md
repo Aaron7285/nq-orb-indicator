@@ -159,9 +159,9 @@ retest level and wait for a later candle to reach it.
 
 | ID | Question | Options | Status |
 |---|---|---|---|
-| D11.1 | Stop for **T1/T3** (reversals) | a) ★ beyond the sweep extreme (if price goes past it, the sweep has failed) · b) beyond the swing the shift started from · c) the farther of a and b · d) ATR multiple | OPEN |
+| D11.1 | Stop for **T1/T3** (reversals) | **a) beyond the sweep extreme** (the most extreme attached sweep, D9.3) | DECIDED |
 | D11.2 ❗ | Stop for **T2** (breakout continuation), if T2 is enabled | **a) beyond the internal swing where the BOS move started** (plus the D11.3 buffer) | DECIDED |
-| D11.3 | Stop **buffer** | ★ 2 ticks | OPEN |
+| D11.3 | Stop **buffer** | **2 ticks** buffer | DECIDED |
 | D11.4 ❗ | **Maximum** stop: larger stops mean no setup | **b) 30 points** maximum (entry to stop, including the buffer); wider stops mean the setup is rejected | DECIDED |
 | D11.5 ❗ | **Minimum** stop | **b) 5 points** minimum; tighter stops mean the setup is rejected ("stop too tight") | DECIDED |
 
@@ -180,10 +180,10 @@ retest level and wait for a later candle to reach it.
 
 | ID | Question | Options | Status |
 |---|---|---|---|
-| D13.1 | A **pending** (not yet entered) setup is cancelled by (choose any) | a) candle closes beyond the stop level (rare with Model B: price normally fills the limit on its way to the stop) · c) expiry, 30 min (D10.7) · d) the window ends at 11:00 Chicago · e) TP1 is reached first, which is MISSED (D10.8). ★ all four. Structure-based cancellation (the old option b) is now D13.3. | OPEN |
-| D13.2 | Can an **active** (entered) setup end early for any reason other than stop, targets or window end? | a) ★ no (prevents flip-flopping) · b) yes: an opposite swing-layer CHoCH closes it | OPEN |
-| D13.3 ❗ | Does an **opposite internal structure break** cancel a **pending** Model B setup? ⚠ Conflict: the pullback needed to reach the FVG 50 % limit can itself break an internal low (for a long), cancelling setups just before they would fill. | b1) yes, an opposite internal break cancels it (strictest; some setups are cancelled during the pullback) · b2) only an opposite **swing-layer** break cancels it (rare within 30 min) · b3) no structure-based cancellation; only D13.1 applies | OPEN |
-| D13.4 | **Order within one candle** when the limit fills and a close-based cancellation (D13.1a, D13.3) happens on the same candle | ★ the fill counts first (it happens during the candle; cancellations are judged at the close). The setup is then ACTIVE, and only stop, targets and window end apply (D13.2). | OPEN |
+| D13.1 | A **pending** (not yet entered) setup is cancelled by (choose any) | **All four**: close beyond the stop · 30-min expiry · 11:00 Chicago window end · TP1 first (MISSED) | DECIDED |
+| D13.2 | Can an **active** (entered) setup end early for any reason other than stop, targets or window end? | **a) no**: an active setup ends only at the stop, TP2, breakeven after TP1, or the 11:00 window close | DECIDED |
+| D13.3 ❗ | Does an **opposite internal structure break** cancel a **pending** Model B setup? ⚠ Conflict: the pullback needed to reach the FVG 50 % limit can itself break an internal low (for a long), cancelling setups just before they would fill. | **b3) no structure-based cancellation**; only the D13.1 rules cancel a pending setup | DECIDED |
+| D13.4 | **Order within one candle** when the limit fills and a close-based cancellation (D13.1a, D13.3) happens on the same candle | **The fill counts first**; the setup is then ACTIVE and only the stop, targets and window end apply | DECIDED |
 
 ## D14 — Lifecycle, cooldown and re-arm
 
@@ -193,19 +193,19 @@ These questions set the remaining details.
 
 | ID | Question | Options | Status |
 |---|---|---|---|
-| D14.1 | Live setups at the same time | a) ★ **one** in total, either direction · b) one per direction | OPEN |
-| D14.2 | **Cooldown** type after a setup ends | a) N candles · b) until the next session starts · c) ★ N candles, **and** then a new core event is required | OPEN |
+| D14.1 | Live setups at the same time | **a) one live setup in total**, either direction | DECIDED |
+| D14.2 | **Cooldown** type after a setup ends | **c) cooldown (D14.3), then a new core event is required** | DECIDED |
 | D14.3 ❗ | Cooldown length (minutes, per D2.4) | **30 minutes**, the same after every outcome, measured from the close of the candle where the outcome happened | DECIDED |
-| D14.4 | Which events may build the next setup | a) ★ only events confirmed **after** the previous setup ended **and** its cooldown finished (strict) · b) only the final trigger event must be new; earlier unused events may be reused | OPEN |
-| D14.5 | Can the event that stopped or invalidated a setup be used for an opposite setup? | a) ★ no: it's used up · b) yes, after cooldown | OPEN |
+| D14.4 | Which events may build the next setup | **a) only events confirmed after the previous setup ended and its cooldown finished** | DECIDED |
+| D14.5 | Can the event that stopped or invalidated a setup be used for an opposite setup? | **a) no**: it is used up | DECIDED |
 | D14.6 ❗ | Extra requirement for an **opposite-direction** setup after a setup ends | **a) nothing extra**: an opposite setup is treated like any other (still needs new events after cooldown) | DECIDED |
-| D14.7 | A candidate **rejected** by a filter (stop too large, R:R too low, outside session, cap) | a) ★ never re-evaluated: each event combination is checked exactly once, on the candle its final event confirms · b) may be re-checked for N candles | OPEN |
+| D14.7 | A candidate **rejected** by a filter (stop too large, R:R too low, outside session, cap) | **a) never re-evaluated**: each event combination is checked exactly once | DECIDED |
 | D14.8 ❗ | Maximum setups **per session** | **2 per morning**, counting **filled setups only** (expired, missed and rejected ones don't count). Once 2 have filled, later candidates are rejected ("cap"). | DECIDED |
 | D14.9 ❗ | Maximum setups **per day** | **Same limit as D14.8**: one cap of 2 filled setups per morning (NY AM is the only tradeable session) | DECIDED |
 | D14.10 ❗ | After a STOPPED setup, can a **same-direction** setup form later in the same session? | **a) yes**, only if built from completely new events after the cooldown | DECIDED |
 | D14.11 | Does "previous setup" reset each morning? | **Yes.** The previous setup only affects setups within the **same morning**; yesterday's setups never affect today's. | DECIDED |
 | D14.12 | What counts as a **stop-out** | **Only a full stop-out at a loss** (STOPPED). Breakeven after TP1, EXPIRED, MISSED and CLOSED_WINDOW don't count. | DECIDED |
-| D14.13 | Does a **rejected** candidate start a cooldown? | ★ no: its events are used up and the state stays ARMED, so only new events can form the next setup (as drafted in setup_lifecycle.md) · alternative: yes, the 30-minute cooldown also follows a rejection | OPEN |
+| D14.13 | Does a **rejected** candidate start a cooldown? | **No**: a rejection uses up its events but does not start a cooldown | DECIDED |
 
 ## D15 — Sessions
 
@@ -324,3 +324,15 @@ These questions set the remaining details.
 | 2026-09-25 | D10.9 | Decided: Accepted: conservative same-candle conventions in entry_models.md §4 | Group 5 answer |
 | 2026-09-25 | D9.13 | Decided: c) either the stop-anchor point or the limit entry is within the D5.8 tolerance of another D5.1-list level; swept or broken levels still count | Group 5 answer |
 | 2026-09-25 | D13.1, D13.3, D13.4, D14.13 | Structure-based cancellation split out as D13.3 (conflict with Model B pullbacks); added same-candle order D13.4 and rejection-cooldown D14.13 | Found while reviewing Group 6 |
+| 2026-09-25 | D11.1 | Decided: a) beyond the sweep extreme (the most extreme attached sweep, D9.3) | Group 6 answer |
+| 2026-09-25 | D11.3 | Decided: 2 ticks buffer | Group 6 answer |
+| 2026-09-25 | D13.1 | Decided: All four: close beyond the stop · 30-min expiry · 11:00 Chicago window end · TP1 first (MISSED) | Group 6 answer |
+| 2026-09-25 | D13.2 | Decided: a) no: an active setup ends only at the stop, TP2, breakeven after TP1, or the 11:00 window close | Group 6 answer |
+| 2026-09-25 | D13.3 | Decided: b3) no structure-based cancellation; only the D13.1 rules cancel a pending setup | Group 6 answer |
+| 2026-09-25 | D13.4 | Decided: The fill counts first; the setup is then ACTIVE and only the stop, targets and window end apply | Group 6 answer |
+| 2026-09-25 | D14.1 | Decided: a) one live setup in total, either direction | Group 6 answer |
+| 2026-09-25 | D14.2 | Decided: c) cooldown (D14.3), then a new core event is required | Group 6 answer |
+| 2026-09-25 | D14.4 | Decided: a) only events confirmed after the previous setup ended and its cooldown finished | Group 6 answer |
+| 2026-09-25 | D14.5 | Decided: a) no: it is used up | Group 6 answer |
+| 2026-09-25 | D14.7 | Decided: a) never re-evaluated: each event combination is checked exactly once | Group 6 answer |
+| 2026-09-25 | D14.13 | Decided: No: a rejection uses up its events but does not start a cooldown | Group 6 answer |
