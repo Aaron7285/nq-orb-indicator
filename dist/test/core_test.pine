@@ -1,5 +1,5 @@
 // ============================================================================
-// NQ.ORB test: core · v0.2.0
+// NQ.ORB test: core · v0.2.1
 // GENERATED FILE. Do not edit by hand: edit the files in src/ and tests/,
 // then run `python tools/build.py`.
 // Modules: core/theme, core/selftest, core/base, core/time, core/price, core/levels, core/events, core/budget, tests/core_selftest
@@ -8,7 +8,7 @@
 indicator("NQ.ORB test: core", shorttitle = "T-core", overlay = true, max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
 
 // Build constants (generated)
-NQORB_VERSION = "0.2.0"
+NQORB_VERSION = "0.2.1"
 NQORB_TARGET = "test_core"
 
 

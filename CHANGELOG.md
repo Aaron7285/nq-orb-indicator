@@ -3,6 +3,14 @@
 Versions follow the phases in [docs/PLAN.md](docs/PLAN.md): each completed phase raises
 the version. The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.2.1] — 2026-09-25
+
+### Changed
+- The version line moved to the bottom-left (it sat behind a TradingView icon) and now warns when the chart is in RTH mode, which hides the overnight candles the system needs.
+
+### Confirmed
+- Sessions self-tests: SESSIONS 13/13 PASS in TradingView.
+
 ## [0.2.0] — 2026-09-25 — Phase 2: sessions
 
 ### Added

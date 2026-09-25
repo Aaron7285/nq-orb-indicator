@@ -1,10 +1,13 @@
 // @module core/status
 // @requires core/theme, core/time
-// @description Quiet version line in the bottom-right corner, plus the untested-timeframe notice (D2.2).
+// @description Quiet version line (bottom-left), plus notices for an untested timeframe (D2.2) or an RTH-only chart.
 
-var table coreStatus = table.new(position.bottom_right, 1, 1)
+var table coreStatus = table.new(position.bottom_left, 1, 1)
 if barstate.islast
     string note = tm_supportedTf(timeframe.period) ? "" : " · untested timeframe: use 1m or 5m"
+    // Overnight candles are required (Asia, London, the full futures day, the 08:00 ORB).
+    if syminfo.session == session.regular
+        note += " · chart is RTH only: switch to ETH (bottom-right of the chart)"
     table.cell(coreStatus, 0, 0, "NQ.ORB " + NQORB_VERSION + note, text_color = THEME.ink2, text_size = size.small)
 
 // Every indicator needs at least one output call; this hidden plot provides it.

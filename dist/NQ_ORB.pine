@@ -1,5 +1,5 @@
 // ============================================================================
-// NQ.ORB · v0.2.0
+// NQ.ORB · v0.2.1
 // GENERATED FILE. Do not edit by hand: edit the files in src/ and tests/,
 // then run `python tools/build.py`.
 // Modules: core/base, core/levels, core/events, core/price, core/budget, core/time, core/theme, modules/sessions_core, modules/sessions, core/status
@@ -8,7 +8,7 @@
 indicator("NQ.ORB", shorttitle = "NQ.ORB", overlay = true, max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
 
 // Build constants (generated)
-NQORB_VERSION = "0.2.0"
+NQORB_VERSION = "0.2.1"
 NQORB_TARGET = "main"
 
 
@@ -522,12 +522,15 @@ if barstate.isconfirmed
 
 // ============================================================================
 // MODULE core/status  (src/core/status.pine)
-// Quiet version line in the bottom-right corner, plus the untested-timeframe notice (D2.2).
+// Quiet version line (bottom-left), plus notices for an untested timeframe (D2.2) or an RTH-only chart.
 // ============================================================================
 
-var table coreStatus = table.new(position.bottom_right, 1, 1)
+var table coreStatus = table.new(position.bottom_left, 1, 1)
 if barstate.islast
     string note = tm_supportedTf(timeframe.period) ? "" : " · untested timeframe: use 1m or 5m"
+    // Overnight candles are required (Asia, London, the full futures day, the 08:00 ORB).
+    if syminfo.session == session.regular
+        note += " · chart is RTH only: switch to ETH (bottom-right of the chart)"
     table.cell(coreStatus, 0, 0, "NQ.ORB " + NQORB_VERSION + note, text_color = THEME.ink2, text_size = size.small)
 
 // Every indicator needs at least one output call; this hidden plot provides it.

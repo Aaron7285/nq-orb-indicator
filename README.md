@@ -16,7 +16,8 @@ probability", and it has no scores, win rates or AI ratings.
 ## Install in TradingView
 
 1. Open [`dist/NQ_ORB.pine`](dist/NQ_ORB.pine) on GitHub, click **Raw**, and copy everything.
-2. In TradingView, open an `NQ1!` or `MNQ1!` chart, then the **Pine Editor** tab at the bottom.
+2. In TradingView, open an `NQ1!` or `MNQ1!` chart **in ETH mode** (bottom-right corner of the chart: ETH, not RTH;
+   the system needs the overnight candles), then the **Pine Editor** tab at the bottom.
 3. Replace the editor's contents with what you copied, click **Save** (name it `NQ.ORB`),
    then click **Add to chart**.
 4. **To update later:** open the saved script, paste the new version over it and save.
