@@ -162,7 +162,7 @@ retest level and wait for a later candle to reach it.
 |---|---|---|---|
 | D12.1 ❗ | **TP1** | **b) nearest untouched opposing liquidity level** (level list per D5.1), placed **a set number of ticks before** the level (D12.6). No level beyond entry means the setup is rejected ("no target"). | DECIDED |
 | D12.2 ❗ | **TP2** | **b) next untouched liquidity level beyond TP1** (same 2-tick offset). If none exists, or it isn't beyond TP1: **keep the setup with TP1 only** (never rejected for lack of a TP2) | DECIDED |
-| D12.3 ❗ | **Minimum R:R** to TP1 for a setup to be created | a) none · b) X R | OPEN |
+| D12.3 ❗ | **Minimum R:R** to TP1 for a setup to be created | **b) 1.0** minimum R:R to TP1 (measured from the limit entry, stop buffer and target offset included); below it, the setup is rejected | DECIDED |
 | D12.4 ❗ | After TP1 is hit | a) stop unchanged · b) stop moves to entry (breakeven) · c) setup ends at TP1 | OPEN |
 | D12.5 ❗ | Setup still active when the trading window/session ends | a) closed at that candle's close · b) stays open until stop or target | OPEN |
 | D12.6 ❗ | Target offset: **how many ticks before** the liquidity level the target sits (1 tick = 0.25 pt) | **2 ticks** (0.5 pt) before the level, for TP1 and TP2 | DECIDED |
@@ -245,3 +245,4 @@ These questions set the remaining details.
 | 2026-09-25 | D12.6 | Added: exact tick offset for targets ("a few ticks" needs a number) | Follow-up to D12.1 |
 | 2026-09-25 | D12.6 | Decided: targets sit 2 ticks before the level | Your answer |
 | 2026-09-25 | D12.2 | Decided: b) next level beyond TP1; fallback = TP1 only, no rejection | Your answer |
+| 2026-09-25 | D12.3 | Decided: minimum R:R 1.0 to TP1 | Your answer |
