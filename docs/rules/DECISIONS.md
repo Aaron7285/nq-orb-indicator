@@ -120,8 +120,8 @@ setup, alone or together.
 | D9.4 | **Location** requirement (zone, FVG, key level) | a) ★ at least one location factor required · b) location is shown on the checklist only · c) a specific one is required (say which) | OPEN |
 | D9.5 | **Session** filter | a) ★ hard filter: setups form only inside sessions you mark as tradeable (D15.2) · b) checklist item only | OPEN |
 | D9.6 ❗ | **Bias** components (choose any) | **Swing-structure trend + price vs VWAP**, VWAP anchored at **08:30 Chicago** | DECIDED |
-| D9.7 | Bias rule | a) ★ all enabled components must agree, otherwise bias = neutral · b) majority | OPEN |
-| D9.8 ❗ | Setups **against the bias** | a) blocked · b) allowed and flagged "counter-bias" · c) bias is shown only, never used as a filter. **Note:** T1/T3 reversals start against the existing trend, so (a) can block them. | OPEN |
+| D9.7 | Bias rule | **a) both components must agree**, otherwise bias = neutral | DECIDED |
+| D9.8 ❗ | Setups **against the bias** | **b) allowed, flagged "counter-bias"** | DECIDED |
 | D9.9 ❗ | Minimum number of **optional** checklist factors (M) | a number; 0 is valid | OPEN |
 | D9.10 | One event combination matches two setup types (e.g. an ORB sweep + shift fits both T1 and T3) | Only one setup is ever created (LC-1). It's labelled a) ★ as the more specific type (T3 over T1) · b) as T1 | OPEN |
 
@@ -225,3 +225,5 @@ These questions set the remaining details.
 | 2026-09-25 | D7.3 | Decided: a) break structure (internal layer) | Your answer |
 | 2026-09-25 | D9.1 | Decided: T1, T2 and T3 enabled | Your answer |
 | 2026-09-25 | D9.6 | Decided: swing-structure trend + price vs VWAP (anchor 08:30 Chicago) | Your answer |
+| 2026-09-25 | D9.7 | Decided: both bias components must agree, otherwise neutral | Your answer |
+| 2026-09-25 | D9.8 | Decided: b) counter-bias setups allowed and flagged | Your answer |
